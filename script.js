@@ -1,0 +1,114 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const accordionItems = document.querySelectorAll('.accordion-item');
+    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+    const navbarContent = document.querySelector('.navbar-content');
+    const navLinks = document.querySelectorAll('.nav-links a');
+
+    // Theme Toggle Logic
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const themeToggleBtnMobile = document.getElementById('theme-toggle-mobile');
+    const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+    const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+    const themeToggleDarkIconMobile = document.getElementById('theme-toggle-dark-icon-mobile');
+    const themeToggleLightIconMobile = document.getElementById('theme-toggle-light-icon-mobile');
+
+    function updateIcons() {
+        if (document.documentElement.classList.contains('dark')) {
+            if(themeToggleDarkIcon) themeToggleDarkIcon.classList.remove('hidden');
+            if(themeToggleLightIcon) themeToggleLightIcon.classList.add('hidden');
+            if(themeToggleDarkIconMobile) themeToggleDarkIconMobile.classList.remove('hidden');
+            if(themeToggleLightIconMobile) themeToggleLightIconMobile.classList.add('hidden');
+        } else {
+            if(themeToggleDarkIcon) themeToggleDarkIcon.classList.add('hidden');
+            if(themeToggleLightIcon) themeToggleLightIcon.classList.remove('hidden');
+            if(themeToggleDarkIconMobile) themeToggleDarkIconMobile.classList.add('hidden');
+            if(themeToggleLightIconMobile) themeToggleLightIconMobile.classList.remove('hidden');
+        }
+    }
+
+    updateIcons();
+
+    function toggleTheme() {
+        if (document.documentElement.classList.contains('dark')) {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('color-theme', 'light');
+        } else {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('color-theme', 'dark');
+        }
+        updateIcons();
+    }
+
+    if (themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
+    if (themeToggleBtnMobile) themeToggleBtnMobile.addEventListener('click', toggleTheme);
+
+    accordionItems.forEach(function(item) {
+        const header = item.querySelector('.accordion-header');
+        header.addEventListener('click', function() {
+            const isActive = item.classList.contains('active');
+            
+            accordionItems.forEach(function(otherItem) {
+                otherItem.classList.remove('active');
+            });
+            
+            if (!isActive) {
+                item.classList.add('active');
+            }
+        });
+    });
+
+    if (mobileMenuToggle && navbarContent) {
+        mobileMenuToggle.addEventListener('click', function() {
+            navbarContent.classList.toggle('mobile-open');
+        });
+
+        navLinks.forEach(function(link) {
+            link.addEventListener('click', function() {
+                navbarContent.classList.remove('mobile-open');
+            });
+        });
+    }
+
+    const contactForm = document.querySelector('.contact-form');
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const message = document.getElementById('message').value.trim();
+            
+            if (!name || !email || !message) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+            
+            alert('Thank you for your message! We will get back to you shortly.');
+            contactForm.reset();
+        });
+    }
+
+    const navbar = document.querySelector('.navbar');
+    if (navbar) {
+        let isTicking = false;
+        window.addEventListener('scroll', function() {
+            if (!isTicking) {
+                window.requestAnimationFrame(function() {
+                    if (window.scrollY > 50) {
+                        navbar.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+                    } else {
+                        navbar.style.boxShadow = 'none';
+                    }
+                    isTicking = false;
+                });
+                isTicking = true;
+            }
+        });
+    }
+});
