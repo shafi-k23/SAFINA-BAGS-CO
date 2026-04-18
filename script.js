@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
     const themeToggleDarkIconMobile = document.getElementById('theme-toggle-dark-icon-mobile');
     const themeToggleLightIconMobile = document.getElementById('theme-toggle-light-icon-mobile');
+    const themeToggleBtnMobileNav = document.getElementById('theme-toggle-mobile-nav');
+    const themeToggleDarkIconNav = document.getElementById('theme-toggle-dark-icon-nav');
+    const themeToggleLightIconNav = document.getElementById('theme-toggle-light-icon-nav');
 
     function updateIcons() {
         if (document.documentElement.classList.contains('dark')) {
@@ -18,11 +21,15 @@ document.addEventListener('DOMContentLoaded', function() {
             if(themeToggleLightIcon) themeToggleLightIcon.classList.add('hidden');
             if(themeToggleDarkIconMobile) themeToggleDarkIconMobile.classList.remove('hidden');
             if(themeToggleLightIconMobile) themeToggleLightIconMobile.classList.add('hidden');
+            if(themeToggleDarkIconNav) themeToggleDarkIconNav.classList.remove('hidden');
+            if(themeToggleLightIconNav) themeToggleLightIconNav.classList.add('hidden');
         } else {
             if(themeToggleDarkIcon) themeToggleDarkIcon.classList.add('hidden');
             if(themeToggleLightIcon) themeToggleLightIcon.classList.remove('hidden');
             if(themeToggleDarkIconMobile) themeToggleDarkIconMobile.classList.add('hidden');
             if(themeToggleLightIconMobile) themeToggleLightIconMobile.classList.remove('hidden');
+            if(themeToggleDarkIconNav) themeToggleDarkIconNav.classList.add('hidden');
+            if(themeToggleLightIconNav) themeToggleLightIconNav.classList.remove('hidden');
         }
     }
 
@@ -41,6 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
     if (themeToggleBtnMobile) themeToggleBtnMobile.addEventListener('click', toggleTheme);
+    if (themeToggleBtnMobileNav) themeToggleBtnMobileNav.addEventListener('click', toggleTheme);
 
     accordionItems.forEach(function(item) {
         const header = item.querySelector('.accordion-header');
