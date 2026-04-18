@@ -78,36 +78,47 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 const contactForm = document.getElementById('contactForm');
+    const formResult = document.getElementById('form-result');
+    
+    // Check for success redirect in URL on load
+    if (window.location.search.includes('success=true') && formResult) {
+        formResult.classList.remove('hidden');
+        formResult.classList.add('bg-tertiary-fixed-dim', 'text-[#464d2c]');
+        formResult.textContent = 'Thank you! Your message has been sent successfully.';
+        
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     if (contactForm) {
         contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // Get elements by their name attributes since they don't have IDs
             const name = contactForm.elements['name'].value.trim();
             const email = contactForm.elements['email'].value.trim();        
             const message = contactForm.elements['message'].value.trim();    
 
             if (!name || !email || !message) {
+                e.preventDefault();
                 alert('Please fill in all required fields.');
                 return;
             }
 
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
+                e.preventDefault();
                 alert('Please enter a valid email address.');
                 return;
             }
 
-            // Constructmailto URL to redirect into their email app
-            const mailtoEmail = "safinabagsco@gmail.com";
-            const mailtoSubject = encodeURIComponent(`New Production Inquiry from ${name}`);
-            const mailtoBody = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
-            
-            // Redirect to email client
-            window.location.href = `mailto:${mailtoEmail}?subject=${mailtoSubject}&body=${mailtoBody}`;
-
-            // Optionally reset the form
-            contactForm.reset();
+            // Let native form submission proceed, just handle the UI feedback
+            const submitBtn = contactForm.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
+                const spanText = submitBtn.querySelector('span:first-child');
+                if (spanText) spanText.textContent = 'Sending...';
+                const iconBtn = submitBtn.querySelector('span.material-symbols-outlined');
+                if (iconBtn) iconBtn.textContent = 'hourglass_empty';
+            }
         });
     }
 
