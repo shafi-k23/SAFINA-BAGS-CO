@@ -69,27 +69,36 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const contactForm = document.querySelector('.contact-form');
+const contactForm = document.getElementById('contactForm');
     if (contactForm) {
         contactForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            const name = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const message = document.getElementById('message').value.trim();
-            
+
+            // Get elements by their name attributes since they don't have IDs
+            const name = contactForm.elements['name'].value.trim();
+            const email = contactForm.elements['email'].value.trim();        
+            const message = contactForm.elements['message'].value.trim();    
+
             if (!name || !email || !message) {
                 alert('Please fill in all required fields.');
                 return;
             }
-            
+
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 alert('Please enter a valid email address.');
                 return;
             }
+
+            // Constructmailto URL to redirect into their email app
+            const mailtoEmail = "safinabagsco@gmail.com";
+            const mailtoSubject = encodeURIComponent(`New Production Inquiry from ${name}`);
+            const mailtoBody = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
             
-            alert('Thank you for your message! We will get back to you shortly.');
+            // Redirect to email client
+            window.location.href = `mailto:${mailtoEmail}?subject=${mailtoSubject}&body=${mailtoBody}`;
+
+            // Optionally reset the form
             contactForm.reset();
         });
     }
