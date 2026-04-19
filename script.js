@@ -77,40 +77,107 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-const contactForm = document.getElementById('contactForm');
+    const contactForm = document.getElementById('contactForm');
     const formResult = document.getElementById('form-result');
-    
-    // Check for success redirect in URL on load
+    const modal = document.getElementById('formStatusModal');
+    const modalBackdrop = document.getElementById('formStatusBackdrop');
+    const modalDialog = document.getElementById('formStatusDialog');
+    const modalSuccessIcon = document.getElementById('modalSuccessIcon');
+    const modalErrorIcon = document.getElementById('modalErrorIcon');
+    const formStatusTitle = document.getElementById('formStatusTitle');
+    const formStatusMessage = document.getElementById('formStatusMessage');
+    const formStatusCloseBtn = document.getElementById('formStatusCloseBtn');
+    const formStatusSecondaryBtn = document.getElementById('formStatusSecondaryBtn');
+
+    // Remove old success redirect parameter check to prefer our new modal, but keep fallback
     if (window.location.search.includes('success=true') && formResult) {
-        formResult.classList.remove('hidden');
-        formResult.classList.add('bg-tertiary-fixed-dim', 'text-[#464d2c]');
-        formResult.textContent = 'Thank you! Your message has been sent successfully.';
-        
-        // Clean URL
         window.history.replaceState({}, document.title, window.location.pathname);
     }
 
+    function showModal(isSuccess) {
+        if (!modal) return;
+        
+        // Configure styles based on status
+        if (isSuccess) {
+            modalSuccessIcon.classList.remove('hidden');
+            modalSuccessIcon.classList.add('flex');
+            modalErrorIcon.classList.add('hidden');
+            modalErrorIcon.classList.remove('flex');
+            formStatusTitle.textContent = 'Thank You';
+            formStatusMessage.textContent = 'Your inquiry has been received successfully.\n\nOur team will review your requirements and get back to you shortly.';
+            formStatusTitle.classList.remove('text-[#9f403d]', 'dark:text-[#fe8983]');
+            formStatusSecondaryBtn.classList.remove('hidden');
+        } else {
+            modalErrorIcon.classList.remove('hidden');
+            modalErrorIcon.classList.add('flex');
+            modalSuccessIcon.classList.add('hidden');
+            modalSuccessIcon.classList.remove('flex');
+            formStatusTitle.textContent = 'Submission Failed';
+            formStatusMessage.textContent = 'Something went wrong. Please try again in a moment.';
+            formStatusTitle.classList.add('text-[#9f403d]', 'dark:text-[#fe8983]');
+            formStatusSecondaryBtn.classList.add('hidden');
+        }
+
+        // Show modal with animation
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        modalDialog.classList.remove('scale-95');
+        modalDialog.classList.add('scale-100');
+
+        // Accessibility Trap
+        formStatusCloseBtn.focus();
+    }
+
+    function closeModal() {
+        if (!modal) return;
+        modal.classList.add('opacity-0', 'pointer-events-none');
+        modalDialog.classList.remove('scale-100');
+        modalDialog.classList.add('scale-95');
+    }
+
+    if (modal) {
+        formStatusCloseBtn.addEventListener('click', closeModal);
+        modalBackdrop.addEventListener('click', closeModal);
+        formStatusSecondaryBtn.addEventListener('click', () => {
+            closeModal();
+            contactForm.elements['name'].focus();
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.classList.contains('pointer-events-none')) {
+                closeModal();
+            }
+        });
+    }
+
     if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
+        contactForm.addEventListener('submit', async function(e) {
+            e.preventDefault(); // Stop native submission
+            
             const name = contactForm.elements['name'].value.trim();
             const email = contactForm.elements['email'].value.trim();        
             const message = contactForm.elements['message'].value.trim();    
 
-            if (!name || !email || !message) {
-                e.preventDefault();
-                alert('Please fill in all required fields.');
-                return;
-            }
-
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                e.preventDefault();
-                alert('Please enter a valid email address.');
+            if (!name || !email || !message || !emailRegex.test(email)) {
+                // Should be caught by HTML5 required/type="email", but just in case:
+                formStatusTitle.textContent = 'Validation Error';
+                formStatusMessage.textContent = 'Please fill in all fields with valid information.';
+                formStatusTitle.classList.add('text-[#9f403d]', 'dark:text-[#fe8983]');
+                modalErrorIcon.classList.remove('hidden');
+                modalErrorIcon.classList.add('flex');
+                modalSuccessIcon.classList.add('hidden');
+                modalSuccessIcon.classList.remove('flex');
+                formStatusSecondaryBtn.classList.add('hidden');
+                
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modalDialog.classList.remove('scale-95');
+                modalDialog.classList.add('scale-100');
                 return;
             }
 
-            // Let native form submission proceed, just handle the UI feedback
             const submitBtn = contactForm.querySelector('button[type="submit"]');
+            const originalSpanText = submitBtn ? submitBtn.querySelector('span:first-child').textContent : 'Send Message';
+            
             if (submitBtn) {
                 submitBtn.disabled = true;
                 submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
@@ -118,6 +185,39 @@ const contactForm = document.getElementById('contactForm');
                 if (spanText) spanText.textContent = 'Sending...';
                 const iconBtn = submitBtn.querySelector('span.material-symbols-outlined');
                 if (iconBtn) iconBtn.textContent = 'hourglass_empty';
+            }
+
+            try {
+                const formData = new FormData(contactForm);
+                const response = await fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+
+                if (response.status === 200 && result.success) {
+                    contactForm.reset();
+                    showModal(true);
+                } else {
+                    showModal(false);
+                }
+            } catch (error) {
+                console.error(error);
+                showModal(false);
+            } finally {
+                // Restore Button State
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+                    const spanText = submitBtn.querySelector('span:first-child');
+                    if (spanText) spanText.textContent = originalSpanText;
+                    const iconBtn = submitBtn.querySelector('span.material-symbols-outlined');
+                    if (iconBtn) iconBtn.textContent = 'east';
+                }
             }
         });
     }

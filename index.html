@@ -780,11 +780,11 @@
 
                         </div>
 
-                        <button type="submit" class="w-full px-8 py-4 text-sm font-bold tracking-widest text-white bg-[#5c5f5b] rounded-lg hover:bg-[#3d403d] transition-colors flex items-center justify-center space-x-3">
+                        <button type="submit" class="w-full px-8 py-4 text-[13px] font-bold tracking-[0.15em] uppercase text-white bg-[#2d3435] dark:bg-[#e0e3de] dark:text-[#1a1d24] rounded-lg hover:bg-[#1a1d24] dark:hover:bg-white transition-all duration-300 flex items-center justify-center space-x-3 group shadow-sm">
 
                             <span>Send Message</span>
 
-                            <span class="material-symbols-outlined">send</span>
+                            <span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">east</span>
 
                         </button>
 
@@ -862,6 +862,35 @@
     </div>
 
 </footer>
+
+<!-- Form Status Modal -->
+<div id="formStatusModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" id="formStatusBackdrop"></div>
+    
+    <div class="relative w-full max-w-md bg-surface-container-lowest dark:bg-[#1a1d24] rounded-2xl shadow-2xl border border-outline-variant/20 transform scale-95 transition-transform duration-300 p-8 text-center" id="formStatusDialog" role="dialog" aria-modal="true">
+        
+        <!-- Success Icon -->
+        <div id="modalSuccessIcon" class="hidden w-16 h-16 mx-auto mb-6 bg-tertiary-fixed-dim/20 text-[#626a46] dark:bg-[#e2eabe]/10 dark:text-[#e2eabe] rounded-full items-center justify-center">
+            <span class="material-symbols-outlined text-3xl">check_circle</span>
+        </div>
+
+        <!-- Error Icon -->
+        <div id="modalErrorIcon" class="hidden w-16 h-16 mx-auto mb-6 bg-error-container/20 text-[#9f403d] dark:bg-[#9f403d]/20 dark:text-[#fe8983] rounded-full items-center justify-center">
+            <span class="material-symbols-outlined text-3xl">error</span>
+        </div>
+
+        <h3 id="formStatusTitle" class="font-display text-2xl mb-4 text-[#2d3435] dark:text-white"></h3>
+        
+        <p id="formStatusMessage" class="font-body text-sm text-[#5a6061] dark:text-[#a0a5ab] mb-2 leading-relaxed whitespace-pre-line"></p>
+        
+        <p class="font-body text-xs text-[#5a6061]/70 dark:text-[#a0a5ab]/70 mb-8" id="formStatusSubMessage">Safina Bags Co appreciates your interest.</p>
+
+        <div class="flex flex-col space-y-3">
+            <button id="formStatusCloseBtn" class="w-full px-6 py-3 text-sm font-bold tracking-widest text-[#ffffff] bg-[#5c5f5b] rounded-lg hover:bg-[#3d403d] transition-colors">Close</button>
+            <button id="formStatusSecondaryBtn" class="w-full px-6 py-3 text-sm font-bold tracking-widest text-[#5c5f5b] dark:text-[#a1a5a2] bg-transparent hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors hidden">Send Another Inquiry</button>
+        </div>
+    </div>
+</div>
 
 <script>document.getElementById('current-year').textContent = new Date().getFullYear();</script>
 
