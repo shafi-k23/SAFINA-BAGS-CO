@@ -239,4 +239,89 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // --- PREMIUM ANIMATION SYSTEM --- //
+    
+    // Scroll Progress Bar
+    const progressBar = document.getElementById('scroll-progress-bar');
+    window.addEventListener('scroll', () => {
+        if (!progressBar) return;
+        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (winScroll / height) * 100;
+        progressBar.style.width = scrolled + '%';
+    }, { passive: true });
+
+    // Back to Top Button
+    const backToTopBtn = document.getElementById('back-to-top');
+    if (backToTopBtn) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 500) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
+        }, { passive: true });
+
+        backToTopBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
+    // Intersection Observer for Reveal Animations
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px 0px -10% 0px', // Trigger slightly before it comes into view
+        threshold: 0.1
+    };
+
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                
+                // If it's a counter, animate it
+                if (entry.target.classList.contains('counter') && !entry.target.classList.contains('counted')) {
+                    entry.target.classList.add('counted');
+                    animateCounter(entry.target);
+                }
+
+                // Unobserve if we only want it to animate once (premium feel, no jumping back and forth)
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    const revealElements = document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right, .reveal-scale, .counter');
+    revealElements.forEach(el => revealObserver.observe(el));
+
+    // Number Counter Animation
+    function animateCounter(element) {
+        const target = parseInt(element.getAttribute('data-target'));
+        const duration = 2000; // 2 seconds
+        const stepTime = Math.abs(Math.floor(duration / target));
+        let current = 0;
+
+        // Easing out function for numbers
+        function easeOutQuart(t) {
+            return 1 - (--t) * t * t * t;
+        }
+        
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            
+            element.innerHTML = Math.floor(easeOutQuart(progress) * target);
+            
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            } else {
+                element.innerHTML = target;
+            }
+        };
+        
+        window.requestAnimationFrame(step);
+    }
 });
