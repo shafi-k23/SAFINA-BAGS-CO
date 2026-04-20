@@ -266,6 +266,19 @@
         /* Navbar dynamic transitions */
         .navbar-scrolled { box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05); padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
 
+        /* Mobile Hero Instant Activation */
+        @media (max-width: 767px) {
+            #hero-section .reveal-up, #hero-section .reveal-scale, #hero-section .reveal-left, #hero-section .reveal-right {
+                opacity: 1 !important;
+                transform: none !important;
+                transition: opacity 0.3s ease-out !important;
+            }
+            #hero-section .delay-100, #hero-section .delay-200, #hero-section .delay-300, #hero-section .delay-400, #hero-section .delay-500 {
+                transition-delay: 0ms !important;
+            }
+            .animate-float { animation: float 8s ease-in-out infinite; } /* Simpler, lighter, slower motion on mobile */
+        }
+
         @media (prefers-reduced-motion: reduce) {
             .reveal-up, .reveal-left, .reveal-right, .reveal-scale { opacity: 1; transform: none; transition: none; }
             .animate-float { animation: none; }
@@ -333,7 +346,7 @@
 
 <main class="md:pt-32 pt-20 overflow-x-hidden">
 
-    <section class="grid grid-cols-1 gap-12 md:grid-cols-12 md:gap-0 items-start px-6 md:px-12 relative mb-20 text-center md:text-left">
+    <section id="hero-section" class="grid grid-cols-1 gap-8 md:grid-cols-12 md:gap-0 items-start px-6 md:px-12 relative mb-12 md:mb-20 text-center md:text-left">
 
         <div class="flex flex-col justify-center col-span-1 md:col-span-12 z-10 lg:col-span-6 order-2 md:order-1 items-center md:items-start">
 
@@ -353,7 +366,7 @@
 
             <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8 w-full md:w-auto px-4 md:px-0 reveal-up delay-300">
 
-                <button class="w-full: md:w-auto px-8 py-4 md:py-3 text-xs md:text-sm tracking-widest uppercase bg-gradient-to-b from-[#5c5f5b] to-[#4f5350] text-[#f6f9f3] font-bold md:font-medium font-body hover:opacity-90 hover:-translate-y-1 transition-all duration-300 rounded-md shadow-lg shadow-[#5c5f5b]/20 hover:shadow-xl" onclick="document.getElementById('contact').scrollIntoView({behavior: 'smooth'})">Start Production</button>
+                <button class="w-full md:w-auto px-8 py-4 md:py-3 text-xs md:text-sm tracking-widest uppercase bg-gradient-to-b from-[#5c5f5b] to-[#4f5350] text-[#f6f9f3] font-bold md:font-medium font-body hover:opacity-90 hover:-translate-y-1 transition-all duration-300 rounded-md shadow-lg shadow-[#5c5f5b]/20 hover:shadow-xl" onclick="document.getElementById('contact').scrollIntoView({behavior: 'smooth'})">Start Production</button>
 
                 <button class="w-full md:w-auto px-8 py-4 md:py-3 text-xs md:text-sm tracking-widest uppercase border border-outline/30 dark:border-white/20 text-on-surface dark:text-[#f8f9fa] font-bold md:font-medium font-body hover:bg-surface-container dark:hover:bg-[#15181e] hover:-translate-y-1 transition-all duration-300 rounded-md" onclick="document.getElementById('products').scrollIntoView({behavior: 'smooth'})">View Catalog</button>
 
@@ -361,27 +374,27 @@
 
         </div>
 
-        <div class="relative flex items-center justify-center md:justify-end h-full col-span-1 md:col-span-12 lg:col-span-6 order-1 md:order-2 mb-8 md:mb-0">
+        <div class="relative flex items-center justify-center md:justify-end h-full col-span-1 md:col-span-12 lg:col-span-6 order-1 md:order-2 mb-4 md:mb-0">
 
-            <div class="w-full md:w-4/5 overflow-hidden aspect-[4/5] bg-surface-container dark:bg-[#15181e] flex flex-col items-center justify-center rounded-xl shadow-2xl md:shadow-none shadow-[#2d3435]/10 reveal-scale">
+            <div class="w-full md:w-4/5 overflow-hidden aspect-video md:aspect-[4/5] bg-surface-container dark:bg-[#15181e] flex flex-col items-center justify-center rounded-xl shadow-2xl md:shadow-none shadow-[#2d3435]/10 reveal-scale">
 
                 <img src="images/image-1.jpg" alt="Lifestyle / Factory Photo of Safina Bags" class="object-cover w-full h-full hover:scale-105 transition-transform duration-1000" width="800" height="1000" fetchpriority="high">
 
             </div>
 
-            <div class="absolute -left-6 -bottom-6 md:left-12 md:-bottom-8 lg:left-16 lg:-bottom-10 w-32 h-32 md:w-40 md:h-40 rounded-full bg-[#2d3435] dark:bg-[#e0e3de] flex flex-col items-center justify-center text-white dark:text-[#2d3435] shadow-xl p-4 scale-90 md:scale-100 z-20 reveal-up delay-400 animate-float">
+            <div class="absolute left-2 -bottom-6 md:left-12 md:-bottom-8 lg:left-16 lg:-bottom-10 w-28 h-28 md:w-40 md:h-40 rounded-full bg-[#2d3435] dark:bg-[#e0e3de] flex flex-col items-center justify-center text-white dark:text-[#2d3435] shadow-xl p-2 md:p-4 scale-100 z-20 reveal-up delay-400 animate-float">
 
                 <!-- Minimal Graphic Inside -->
-                <span class="material-symbols-outlined text-[18px] md:text-[22px] mb-1 opacity-90 text-[#faf9f7] dark:text-[#2d3435]">domain_verification</span>
+                <span class="material-symbols-outlined text-[16px] md:text-[22px] mb-0.5 md:mb-1 opacity-90 text-[#faf9f7] dark:text-[#2d3435]">domain_verification</span>
 
                 <div class="flex items-baseline leading-none">
-                    <span class="font-bold text-xl md:text-2xl font-headline counter" data-target="500">0</span>
-                    <span class="font-bold text-xl md:text-2xl font-headline ml-0.5 text-primary dark:text-[#2d3435]">+</span>
+                    <span class="font-bold text-lg md:text-2xl font-headline counter" data-target="500">0</span>
+                    <span class="font-bold text-lg md:text-2xl font-headline ml-0.5 text-primary dark:text-[#2d3435]">+</span>
                 </div>
 
-                <span class="text-[6px] md:text-[7px] tracking-widest uppercase text-center mt-1 font-bold leading-tight">Production Scale</span>
+                <span class="text-[5px] md:text-[7px] tracking-widest uppercase text-center mt-1 font-bold leading-tight">Production Scale</span>
 
-                <span class="text-[5px] md:text-[6px] tracking-widest uppercase text-center mt-1 md:mt-2 font-medium leading-tight opacity-70 hidden md:block">Companies trust our network for bulk quantities.</span>
+                <span class="text-[4px] md:text-[6px] tracking-widest uppercase text-center mt-1 md:mt-2 font-medium leading-tight opacity-70 hidden md:block">Companies trust our network for bulk quantities.</span>
 
             </div>
 
