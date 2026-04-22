@@ -247,9 +247,9 @@ export default function ContactFAQ() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
               transition={{ type: "spring", stiffness: 300, damping: 25, duration: 0.4 }}
-              className="bg-surface-container-lowest dark:bg-[#172019] p-8 md:p-10 rounded-3xl shadow-2xl max-w-md w-full border border-outline-variant/30 dark:border-white/10 text-center relative"
+              className="bg-white dark:bg-[#172019] p-8 md:p-10 rounded-3xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-[#2a3530] text-center relative"
             >
-              <div className="w-16 h-16 mx-auto bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-6">
+              <div className="w-16 h-16 mx-auto bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mb-6">
                 <motion.span 
                   className="material-symbols-outlined text-3xl text-green-600 dark:text-green-400"
                   animate={{ scale: [1, 1.1, 1] }}
