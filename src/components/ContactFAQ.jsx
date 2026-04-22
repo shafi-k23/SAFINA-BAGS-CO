@@ -5,12 +5,12 @@ export default function ContactFAQ() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // Auto-close modal after 5 seconds
+  // Auto-close modal after 10 seconds
   useEffect(() => {
     if (showSuccessModal) {
       const timer = setTimeout(() => {
         setShowSuccessModal(false);
-      }, 5000);
+      }, 10000);
       return () => clearTimeout(timer);
     }
   }, [showSuccessModal]);
@@ -240,7 +240,7 @@ export default function ContactFAQ() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm"
           >
             <motion.div 
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -274,7 +274,7 @@ export default function ContactFAQ() {
                 <motion.div 
                   initial={{ width: "100%" }}
                   animate={{ width: "0%" }}
-                  transition={{ duration: 5, ease: "linear" }}
+                  transition={{ duration: 10, ease: "linear" }}
                   className="h-full bg-green-500 dark:bg-green-400"
                 />
               </motion.div>
@@ -287,7 +287,7 @@ export default function ContactFAQ() {
                   Close & Return
                 </button>
                 <p className="text-xs text-[#8a9589] dark:text-[#6b756b]">
-                  Automatically closing in 5 seconds... (Fallback: click button above)
+                  Automatically closing in 10 seconds... (Fallback: click button above)
                 </p>
               </div>
             </motion.div>
