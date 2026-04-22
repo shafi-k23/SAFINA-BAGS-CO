@@ -1,0 +1,35 @@
+{
+  "name": "safina-bags",
+  "version": "1.0.0",
+  "description": "",
+  "main": "fix-classes.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shafi-k23/SAFINA-BAGS-CO.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/shafi-k23/SAFINA-BAGS-CO/issues"
+  },
+  "homepage": "https://github.com/shafi-k23/SAFINA-BAGS-CO#readme",
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.38.0",
+    "lucide-react": "^1.8.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "tailwind-merge": "^3.5.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.1",
+    "vite": "^8.0.9"
+  }
+}

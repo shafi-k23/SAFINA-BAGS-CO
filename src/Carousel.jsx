@@ -1,0 +1,252 @@
+import React, { useRef, useState, useEffect } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+function cn(...inputs) {
+  return twMerge(clsx(inputs));
+}
+
+const products = [
+  {
+    id: 1,
+    title: "Corporate Laptop Bags",
+    subtitle: "TECH-READY • MINIMALIST",
+    desc: "For tech companies, startups, and onboarding kits. Structured compartments and secure organization.",
+    image: "images/image-3.jpg",
+  },
+  {
+    id: 2,
+    title: "Travel & Field Gear",
+    subtitle: "RUGGED",
+    desc: "For logistics teams, field workers, and travel brands. High-capacity builds with weather-resistant materials.",
+    image: "images/image-4.jpg",
+  },
+  {
+    id: 3,
+    title: "Executive & Gifting",
+    subtitle: "PREMIUM • GIFTING",
+    desc: "Premium branded bags for corporate gifting and VIP clients with subtle, elegant customization.",
+    image: "images/image-5.jpg",
+  },
+  {
+    id: 4,
+    title: "School & College Bags",
+    subtitle: "INSTITUTIONAL",
+    desc: "Institutional bulk orders for education. Built for daily wear and tear with ergonomic support.",
+    image: null, // Dummy image card
+  },
+  {
+    id: 5,
+    title: "Duffle & Gym Bags",
+    subtitle: "FITNESS • WELLNESS",
+    desc: "Fitness brands, corporate wellness programs, and sports teams. Ventilated and spacious.",
+    image: null,
+  },
+  {
+    id: 6,
+    title: "Custom Design",
+    subtitle: "BESPOKE",
+    desc: "Fully bespoke designs from scratch to match your specific brand vision or functionality requirements.",
+    image: null,
+  }
+];
+
+// Duplicate for vast left/right scrolling
+const infiniteProducts = [...products, ...products, ...products, ...products, ...products];
+
+// --- 3D PRODUCT CARD ---
+const ProductCard = ({ product }) => {
+  const boundingRef = useRef(null);
+
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseXSpring = useSpring(x, { stiffness: 150, damping: 20 });
+  const mouseYSpring = useSpring(y, { stiffness: 150, damping: 20 });
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["6deg", "-6deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-6deg", "6deg"]);
+
+  const handleMouseMove = (e) => {
+    if (!boundingRef.current || window.innerWidth < 1024) return;
+    const rect = boundingRef.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    x.set(mouseX / width - 0.5);
+    y.set(mouseY / height - 0.5);
+  };
+
+  const handleMouseLeave = () => {
+    if (window.innerWidth < 1024) return;
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.div
+      ref={boundingRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ rotateX, rotateY, transformStyle: "preserve-3d", perspective: 1000 }}
+      className="relative flex flex-col flex-shrink-0 h-full w-[82vw] sm:w-[260px] lg:w-[280px] xl:w-[300px] mx-3 md:mx-5 rounded-[24px] group bg-surface-container-lowest dark:bg-[#111916] border border-outline-variant/30 dark:border-white/10 shadow-sm hover:shadow-2xl hover:-translate-y-1 hover:border-[#1a2a22] dark:hover:border-[#c5d5bf] transition-all duration-500 will-change-transform touch-pan-y"
+    >
+      <div style={{ transform: "translateZ(30px)", transformStyle: "preserve-3d" }} className="flex flex-col h-full rounded-[24px] overflow-hidden pointer-events-none">
+        
+        {/* Top Image Box */}
+        <div className="relative w-full aspect-[4/5] bg-[#f2f0ea] dark:bg-[#131b16] flex items-center justify-center border-b border-outline-variant/10 dark:border-white/5 overflow-hidden select-none">
+          {product.image ?
+            <img 
+              src={product.image} 
+              alt={product.title} 
+              draggable="false"
+              className="object-cover object-center w-full h-full group-hover:scale-[1.05] transition-transform duration-[800ms] pointer-events-none"
+            />
+          : (
+            <div className="absolute inset-0 bg-[#c5d5bf] dark:bg-[#1c2620] flex items-center justify-center">
+              <span className="text-[#454e47] dark:text-[#8a9589] font-body text-sm tracking-widest uppercase">
+                Image Pending
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom Text Box */}
+        <div className="p-6 md:p-8 flex flex-col flex-grow bg-white dark:bg-[#111916]">
+          <div className="flex flex-wrap gap-2 mb-4">
+            {product.subtitle.split('•').map((sub, i) => (
+              <span key={i} className="px-3 py-1 text-[9px] font-bold tracking-[0.2em] uppercase border border-outline-variant/40 dark:border-[#8a9589]/30 rounded-full text-[#454e47] dark:text-[#8a9589]">
+                {sub.trim()}
+              </span>
+            ))}
+          </div>
+          <h3 className="text-xl md:text-2xl font-headline text-[#1a2a22] dark:text-white mb-2 leading-tight pointer-events-auto">
+            {product.title}
+          </h3>
+          <p className="text-sm font-body text-[#454e47] dark:text-[#8a9589] leading-relaxed flex-grow line-clamp-3 pointer-events-auto">
+            {product.desc}
+          </p>
+          
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              window.prefillForm && window.prefillForm(product.title);
+              document.getElementById('contact')?.scrollIntoView({behavior: 'smooth'})
+            }}
+            className="mt-6 flex items-center space-x-2 text-[11px] font-bold tracking-[0.15em] uppercase text-[#454e47] dark:text-[#8a9589] hover:text-[#1a2a22] dark:hover:text-white transition-colors duration-300 pointer-events-auto group/btn"
+          >
+            <span>Get Quote for This Line</span>
+            <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1.5 transition-transform duration-300" />
+          </button>
+        </div>
+
+      </div>
+    </motion.div>
+  );
+};
+
+export default function Carousel() {
+  const containerRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeftPos, setScrollLeftPos] = useState(0);
+
+  // Initialize loop in the middle
+  useEffect(() => {
+    if (containerRef.current) {
+        // Find approximate center of the 5-cloned array (jump to set 3)
+        const track = containerRef.current;
+        const middleOffset = (track.scrollWidth / 5) * 2; 
+        track.scrollLeft = middleOffset;
+    }
+  }, []);
+
+  // Desktop Mouse Drag Controls
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    setStartX(e.pageX - containerRef.current.offsetLeft);
+    setScrollLeftPos(containerRef.current.scrollLeft);
+  };
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x = e.pageX - containerRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5; // Drag speed multiplier
+    containerRef.current.scrollLeft = scrollLeftPos - walk;
+  };
+  const handleMouseUp = () => setIsDragging(false);
+
+  const scrollLeft = () => {
+    if (containerRef.current) {
+      const cardWidth = window.innerWidth < 1024 ? window.innerWidth * 0.82 : (window.innerWidth >= 1280 ? 340 : 320);
+      containerRef.current.scrollBy({ left: -cardWidth, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (containerRef.current) {
+      const cardWidth = window.innerWidth < 1024 ? window.innerWidth * 0.82 : (window.innerWidth >= 1280 ? 340 : 320);
+      containerRef.current.scrollBy({ left: cardWidth, behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <section className="relative w-full overflow-hidden bg-surface dark:bg-[#0a0f0c] select-none pt-16 md:pt-24 pb-4 transition-colors duration-300">
+      
+      <div className="max-w-[1600px] mx-auto px-6 md:px-12 mb-10 flex flex-col md:flex-row items-start md:items-end justify-between gap-6 reveal-up">
+        <div className="max-w-2xl reveal-up">
+            <span className="block text-[10px] md:text-xs font-bold tracking-[0.3em] uppercase font-body text-on-surface-variant dark:text-[#8a9589] mb-4">Our Catalog</span>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-headline text-[#1a2a22] dark:text-white leading-tight">Our Product Lines</h2>
+            <p className="mt-6 text-base md:text-lg font-body text-[#454e47] dark:text-[#8a9589] leading-relaxed">
+                Purpose-built collections engineered for distinct operational requirements. From executive gifting to field deployments.
+            </p>
+        </div>
+      </div>
+
+      {/* Swipeable Tracking Grid */}
+      <div className="w-full relative pb-4 md:pb-6 overflow-hidden mx-auto max-w-[1600px]">
+        {/* Desktop Controls */}
+        <div className="absolute top-1/2 -translate-y-1/2 left-2 right-2 md:left-6 md:right-6 hidden lg:flex justify-between pointer-events-none z-10">
+          <button onClick={scrollLeft} className="w-12 h-12 rounded-full bg-white/80 dark:bg-black/50 backdrop-blur border border-outline-variant/30 hover:scale-110 transition-transform pointer-events-auto flex items-center justify-center text-[#1a2a22] dark:text-white shadow-lg">
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <button onClick={scrollRight} className="w-12 h-12 rounded-full bg-white/80 dark:bg-black/50 backdrop-blur border border-outline-variant/30 hover:scale-110 transition-transform pointer-events-auto flex items-center justify-center text-[#1a2a22] dark:text-white shadow-lg">
+            <ChevronRight className="w-6 h-6" />
+          </button>
+        </div>
+
+        <div
+          ref={containerRef}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          className={cn(
+            "flex flex-row items-stretch overflow-x-auto overflow-y-hidden px-[calc(50vw-41vw)] sm:px-[calc(50vw-130px)] lg:px-[calc(50vw-140px)] xl:px-[calc(50vw-150px)] py-12 -my-6 touch-pan-y transition-all",
+            isDragging ? "cursor-grabbing snap-none" : "cursor-grab snap-x snap-mandatory"
+          )}
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {infiniteProducts.map((product, idx) => (
+            <motion.div 
+              key={`${product.id}-${idx}`} 
+              className="snap-center pointer-events-auto flex-shrink-0 flex items-stretch h-auto"
+              initial={{ opacity: 0.6, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: false, amount: 0.4 }}
+              transition={{ duration: 0.35, ease: "easeOut" }}
+            >
+                <ProductCard product={product} />
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+    </section>
+  );
+}
