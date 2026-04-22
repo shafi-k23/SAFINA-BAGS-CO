@@ -1,7 +1,42 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ContactFAQ() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  // Auto-close modal after 5 seconds
+  useEffect(() => {
+    if (showSuccessModal) {
+      const timer = setTimeout(() => {
+        setShowSuccessModal(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccessModal]);
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    const formData = new FormData(e.target);
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData
+      });
+      const data = await response.json();
+      if (data.success) {
+        setShowSuccessModal(true);
+        e.target.reset();
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const qas = [
     {
       q: "What is the minimum order quantity (MOQ)?",
@@ -137,7 +172,7 @@ export default function ContactFAQ() {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <form id="contactForm" action="https://api.web3forms.com/submit" method="POST" className="bg-surface-container-lowest dark:bg-[#172019] p-8 md:p-12 rounded-2xl shadow-sm border border-outline-variant/20 dark:border-white/10 relative">
+              <form id="contactForm" onSubmit={handleFormSubmit} className="bg-surface-container-lowest dark:bg-[#172019] p-8 md:p-12 rounded-2xl shadow-sm border border-outline-variant/20 dark:border-white/10 relative">
                 <input type="hidden" name="access_key" value="a539b4fa-79d2-406b-a019-96b5d74496b1" />
                 <input type="hidden" name="subject" value="New B2B Website Inquiry" />
                 <input type="hidden" name="from_name" value="Safina Web Portal" />
@@ -182,15 +217,83 @@ export default function ContactFAQ() {
                   </div>
                 </div>
 
-                <button type="submit" className="w-full px-8 py-4 text-[13px] font-bold tracking-[0.15em] uppercase text-white bg-[#1a2a22] dark:bg-[#c5d5bf] dark:text-[#172019] rounded-lg hover:bg-[#172019] dark:hover:bg-white transition-all duration-300 flex items-center justify-center space-x-3 group shadow-sm">
-                  <span>Submit Inquiry</span>
-                  <span className="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">east</span>
+                <button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="w-full px-8 py-4 text-[13px] font-bold tracking-[0.15em] uppercase text-white bg-[#1a2a22] dark:bg-[#c5d5bf] dark:text-[#172019] rounded-lg hover:bg-[#172019] dark:hover:bg-white transition-all duration-300 flex items-center justify-center space-x-3 group shadow-sm disabled:opacity-75 disabled:cursor-not-allowed"
+                >
+                  <span>{isSubmitting ? "Submitting Inquiry..." : "Submit Inquiry"}</span>
+                  {!isSubmitting && <span className="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">east</span>}
+                  {isSubmitting && <span className="material-symbols-outlined text-[18px] animate-spin">hourglass_empty</span>}
                 </button>
               </form>
             </motion.div>
           </div>
         </div>
       </section>
+
+      {/* Success Modal */}
+      <AnimatePresence>
+        {showSuccessModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25, duration: 0.4 }}
+              className="bg-surface-container-lowest dark:bg-[#172019] p-8 md:p-10 rounded-3xl shadow-2xl max-w-md w-full border border-outline-variant/30 dark:border-white/10 text-center relative"
+            >
+              <div className="w-16 h-16 mx-auto bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-6">
+                <motion.span 
+                  className="material-symbols-outlined text-3xl text-green-600 dark:text-green-400"
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 0.6, ease: "easeInOut" }}
+                >
+                  check_circle
+                </motion.span>
+              </div>
+              
+              <h3 className="text-2xl font-headline text-[#1a2a22] dark:text-white mb-3">
+                Inquiry Received
+              </h3>
+              
+              <p className="text-sm md:text-base font-body text-[#454e47] dark:text-[#8a9589] leading-relaxed mb-8">
+                Thank you for reaching out to Safina Bags Co. We have successfully received your requirements, and our coordination team will review your details and respond with a comprehensive breakdown within <strong className="text-[#1a2a22] dark:text-white">4 business hours</strong>.
+              </p>
+
+              {/* Progress bar for auto-close */}
+              <motion.div 
+                className="h-1 bg-green-500/20 rounded-full mb-6 overflow-hidden"
+              >
+                <motion.div 
+                  initial={{ width: "100%" }}
+                  animate={{ width: "0%" }}
+                  transition={{ duration: 5, ease: "linear" }}
+                  className="h-full bg-green-500 dark:bg-green-400"
+                />
+              </motion.div>
+              
+              <div className="flex flex-col gap-3">
+                <button 
+                  onClick={() => setShowSuccessModal(false)}
+                  className="w-full px-6 py-3.5 text-[12px] font-bold tracking-[0.15em] uppercase text-white bg-[#1a2a22] dark:bg-[#c5d5bf] dark:text-[#172019] rounded-lg hover:bg-[#172019] dark:hover:bg-white transition-all duration-300"
+                >
+                  Close & Return
+                </button>
+                <p className="text-xs text-[#8a9589] dark:text-[#6b756b]">
+                  Automatically closing in 5 seconds... (Fallback: click button above)
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
