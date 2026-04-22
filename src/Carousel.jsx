@@ -93,7 +93,7 @@ const ProductCard = ({ product }) => {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{ rotateX, rotateY, transformStyle: "preserve-3d", perspective: 1000 }}
-      className="relative flex flex-col flex-shrink-0 h-full w-[82vw] sm:w-[260px] lg:w-[280px] xl:w-[300px] mx-3 md:mx-5 rounded-[24px] group bg-surface-container-lowest dark:bg-[#111916] border border-outline-variant/30 dark:border-white/10 shadow-sm hover:shadow-2xl hover:-translate-y-1 hover:border-[#1a2a22] dark:hover:border-[#c5d5bf] transition-all duration-500 will-change-transform touch-pan-y"
+      className="relative flex flex-col flex-shrink-0 h-full w-[82vw] sm:w-[260px] lg:w-[280px] xl:w-[300px] mx-3 md:mx-5 rounded-[24px] group bg-surface-container-lowest dark:bg-[#111916] border border-outline-variant/30 dark:border-white/10 shadow-sm hover:shadow-2xl hover:-translate-y-1 hover:border-[#1a2a22] dark:hover:border-[#c5d5bf] transition-all duration-500 will-change-transform"
     >
       <div style={{ transform: "translateZ(30px)", transformStyle: "preserve-3d" }} className="flex flex-col h-full rounded-[24px] overflow-hidden pointer-events-none">
         
