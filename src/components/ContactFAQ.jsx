@@ -138,7 +138,7 @@ export default function ContactFAQ() {
               transition={{ duration: 0.6, delay: 0.2 }}
             >
               <form id="contactForm" action="https://api.web3forms.com/submit" method="POST" className="bg-surface-container-lowest dark:bg-[#172019] p-8 md:p-12 rounded-2xl shadow-sm border border-outline-variant/20 dark:border-white/10 relative">
-                <input type="hidden" name="access_key" value="ea37fb93-27cc-44a6-b513-4af97cd7756f" />
+                <input type="hidden" name="access_key" value="a539b4fa-79d2-406b-a019-96b5d74496b1" />
                 <input type="hidden" name="subject" value="New B2B Website Inquiry" />
                 <input type="hidden" name="from_name" value="Safina Web Portal" />
                 <input type="checkbox" name="botcheck" className="hidden" style={{display: 'none'}} />
