@@ -227,7 +227,7 @@ export default function Carousel() {
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
           className={cn(
-            "flex flex-row items-stretch overflow-x-auto overflow-y-hidden px-[calc(50vw-41vw)] sm:px-[calc(50vw-130px)] lg:px-[calc(50vw-140px)] xl:px-[calc(50vw-150px)] py-12 -my-6 touch-pan-y transition-all",
+            "flex flex-row items-stretch overflow-x-auto overflow-y-hidden px-[calc(50vw-41vw)] sm:px-[calc(50vw-130px)] lg:px-[calc(50vw-140px)] xl:px-[calc(50vw-150px)] py-12 -my-6 transition-all",
             isDragging ? "cursor-grabbing snap-none" : "cursor-grab snap-x snap-mandatory"
           )}
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
