@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://safinabagsco.me/sitemap.xml
