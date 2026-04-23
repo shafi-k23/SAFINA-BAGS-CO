@@ -22,14 +22,16 @@ export default function FloatingWhatsApp() {
     <AnimatePresence>
       {isVisible && (
         <motion.a
-          initial={{ opacity: 0, scale: 0.5, y: 50 }}
+          initial={{ opacity: 0, scale: 0.8, y: 40 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.5, y: 50 }}
-          transition={{ type: "spring", stiffness: 200, damping: 20 }}
+          exit={{ opacity: 0, scale: 0.8, y: 40 }}
+          transition={{ type: "spring", stiffness: 260, damping: 20 }}
+          whileHover={{ scale: 1.05, y: -4 }}
+          whileTap={{ scale: 0.95 }}
           href="https://wa.me/919353336030?text=Hi%20Safina%20Bags%2C%20I%20am%20interested%20in%20bulk%20bags."
           target="_blank"
           rel="noreferrer"
-          className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-50 flex items-center justify-center gap-3 px-5 py-3.5 bg-[#1a2a22] text-[#f0f5ee] dark:bg-[#c5d5bf] dark:text-[#111916] rounded-[20px] shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-[#ffffff]/10 hover:shadow-[0_8px_40px_rgb(0,0,0,0.2)] hover:-translate-y-1 hover:scale-[1.02] active:scale-95 transition-all duration-300"
+          className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-50 flex items-center justify-center gap-3 px-5 py-3.5 bg-[#1a2a22] text-[#f0f5ee] dark:bg-[#c5d5bf] dark:text-[#111916] rounded-[20px] shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-[#ffffff]/10 hover:shadow-[0_8px_40px_rgb(0,0,0,0.2)] transition-shadow duration-300"
           aria-label="Contact Us"
         >
           <span className="material-symbols-outlined text-[24px]">forum</span>
