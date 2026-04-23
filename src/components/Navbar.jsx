@@ -6,11 +6,8 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (
-      localStorage.getItem('color-theme') === 'dark' ||
-      (!('color-theme' in localStorage) &&
-        window.matchMedia('(prefers-color-scheme: dark)').matches)
-    ) {
+    // Default to light mode unless the user explicitly chose dark mode previously
+    if (localStorage.getItem('color-theme') === 'dark') {
       document.documentElement.classList.add('dark');
       setIsDark(true);
     } else {
