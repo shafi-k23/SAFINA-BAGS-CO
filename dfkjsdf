@@ -1,0 +1,29 @@
+[33m30412d5[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Optimize SEO, migrate to local Tailwind CSS, add sitemap and robots.txt
+[33m1d6d20d[m Fix carousel jitter and scrolling physics on mobile
+[33m4c2e9e1[m Refactor carousel UI, update WhatsApp widget, and fix favicon
+[33mad8180e[m Update Navbar to default to light mode ignoring OS preference
+[33md55d728[m Improve FloatingWhatsApp animation smoothness
+[33me2e0b9d[m Fix logo path in Navbar - use absolute path for Firefox compatibility
+[33m86b2fb8[m fix: add cross-browser favicon support for Firefox
+[33m7890195[m Fix animation jitter on mobile, reduce navbar gap, and optimize spring physics
+[33mf4ce055[m Fix modal card transparency - use solid white background for light mode and solid borders
+[33mbdcaf65[m Fix modal transparency and increase fade-out timing to 10 seconds
+[33m8014d87[m Add auto-close with fade-out timer to success modal
+[33mad7ddd1[m fix: update Web3Forms access key
+[33m1722167[m fix: remove touch-pan-y from the individual product cards as well
+[33m3e752fc[m fix: enable mobile touch swiping in Carousel by removing restrictive touch-pan-y CSS
+[33mf0b3eaa[m fix: actually commit the public/images directory
+[33m3b4d935[m fix: move images into Vite public folder for Vercel deployment
+[33maa5211c[m chore: remove tracked node_modules for Vercel deployment
+[33mbb3dc2e[m commit1
+[33me10c402[m commit10
+[33m6276279[m commit9
+[33mbcb9176[m commit8
+[33m5754c0f[m commit7
+[33m25e158d[m commit6
+[33m845e40e[m commit5
+[33m52e55cb[m commit5
+[33mf9f4c4d[m commit4
+[33m12c1ac0[m commit3
+[33mc31abaa[m commit2
+[33m03e8147[m commit1

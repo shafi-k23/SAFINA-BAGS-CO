@@ -88,7 +88,6 @@ export default function FloatingWhatsApp() {
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Enter Your Message..."
                     className="flex-1 px-4 py-2.5 text-sm bg-white dark:bg-gray-800 border-none rounded-full focus:ring-1 focus:ring-[#0b9a6d] dark:text-white shadow-sm"
-                    autoFocus
                   />
                   <button
                     type="submit"
