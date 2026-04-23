@@ -1,3 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #2c3e2d;
+  --color-on-primary: #f0f5ee;
+  --color-primary-container: #c5d5bf;
+  --color-surface: #faf8f4;
+  --color-on-surface: #1a2a22;
+  --color-surface-variant: #dee4d9;
+  --color-on-surface-variant: #454e47;
+  --color-outline-variant: #a6b0a3;
+
+  --font-headline: "Playfair Display", serif;
+  --font-body: "Manrope", sans-serif;
+  --font-label: "Manrope", sans-serif;
+}
+
 /* ============================================
    SAFINA BAGS CO. — DESIGN SYSTEM
    Clean foundation for Tailwind CDN overlay
@@ -144,16 +161,13 @@ html.dark .navbar-scrolled {
         opacity: 1 !important;
         transition: none !important;
         transform: translate(0, 0) scale(1);
-        /* Retain float animation, just disable reveal */
         animation: float 4s ease-in-out infinite !important;
         will-change: transform;
     }
-    /* Don't shrink nav too much on mobile */
     .navbar-scrolled {
         padding-top: 1rem !important;
         padding-bottom: 1rem !important;
     }
-    /* Optimize mobile animations */
     * {
         -webkit-transform: translateZ(0);
         transform: translateZ(0);
