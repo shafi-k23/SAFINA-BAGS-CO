@@ -63,11 +63,11 @@ const ProductCard = ({ product }) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
-  const mouseXSpring = useSpring(x, { stiffness: 150, damping: 20 });
-  const mouseYSpring = useSpring(y, { stiffness: 150, damping: 20 });
+  const mouseXSpring = useSpring(x, { stiffness: 100, damping: 25 });
+  const mouseYSpring = useSpring(y, { stiffness: 100, damping: 25 });
 
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["6deg", "-6deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-6deg", "6deg"]);
+  const rotateX = useTransform(mouseYSpring, [-0.25, 0.25], ["3deg", "-3deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.25, 0.25], ["-3deg", "3deg"]);
 
   const handleMouseMove = (e) => {
     if (!boundingRef.current || window.innerWidth < 1024) return;
@@ -77,8 +77,8 @@ const ProductCard = ({ product }) => {
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
     
-    x.set(mouseX / width - 0.5);
-    y.set(mouseY / height - 0.5);
+    x.set((mouseX / width - 0.5) * 0.5);
+    y.set((mouseY / height - 0.5) * 0.5);
   };
 
   const handleMouseLeave = () => {
@@ -236,10 +236,10 @@ export default function Carousel() {
             <motion.div 
               key={`${product.id}-${idx}`} 
               className="snap-center pointer-events-auto flex-shrink-0 flex items-stretch h-auto"
-              initial={{ opacity: 0.6, scale: 0.9 }}
+              initial={{ opacity: 0.8, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: false, amount: 0.4 }}
-              transition={{ duration: 0.35, ease: "easeOut" }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
             >
                 <ProductCard product={product} />
             </motion.div>

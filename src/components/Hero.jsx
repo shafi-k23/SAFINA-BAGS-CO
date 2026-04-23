@@ -15,7 +15,7 @@ export default function Hero() {
     show: {
       opacity: 1,
       y: 0,
-      transition: { type: 'spring', stiffness: 100, damping: 20 },
+      transition: { type: 'spring', stiffness: 60, damping: 25 },
     },
   };
 
@@ -30,7 +30,7 @@ export default function Hero() {
       initial="hidden"
       animate="show"
       id="hero-section"
-      className="grid grid-cols-1 gap-5 md:grid-cols-12 md:gap-0 items-start px-6 md:px-12 relative mb-16 md:mb-20 text-left pt-32"
+      className="grid grid-cols-1 gap-5 md:grid-cols-12 md:gap-0 items-start px-6 md:px-12 relative mb-16 md:mb-20 text-left pt-20 md:pt-32"
     >
       <div className="flex flex-col justify-center col-span-1 md:col-span-12 z-10 lg:col-span-6 order-2 md:order-1 items-start mt-1 md:mt-0">
         <motion.p
@@ -96,8 +96,8 @@ export default function Hero() {
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', delay: 0.2, duration: 1.5 }}
-          className="w-full md:w-4/5 overflow-hidden aspect-[4/5] bg-surface-container dark:bg-[#131b16] flex flex-col items-center justify-center rounded-2xl shadow-xl md:shadow-none shadow-[#1a2a22]/10"
+          transition={{ type: 'spring', delay: 0.2, duration: 1.2, stiffness: 60, damping: 25 }}
+          className="w-full md:w-4/5 overflow-hidden aspect-[4/5] bg-surface-container dark:bg-[#131b16] flex flex-col items-center justify-center rounded-2xl shadow-xl md:shadow-none shadow-[#1a2a22]/10 will-change-transform"
         >
           <img
             src="images/image-1.jpg"
@@ -112,12 +112,12 @@ export default function Hero() {
         {/* Floating Badge */}
         <motion.div
           initial={{ y: 50, opacity: 0 }}
-          animate={{ y: [0, -10, 0], opacity: 1 }}
+          animate={{ y: [0, -8, 0], opacity: 1 }}
           transition={{
-            y: { repeat: Infinity, duration: 3, ease: 'easeInOut' },
+            y: { repeat: Infinity, duration: 4, ease: 'easeInOut' },
             opacity: { delay: 0.6, duration: 0.5 },
           }}
-          className="absolute -left-4 -bottom-6 md:left-12 md:-bottom-8 lg:left-16 lg:-bottom-10 w-32 h-32 md:w-40 md:h-40 rounded-full bg-[#1a2a22] dark:bg-[#c5d5bf] flex flex-col items-center justify-center text-white dark:text-[#1a2a22] shadow-2xl p-4 scale-95 md:scale-100 z-20 border-4 border-surface dark:border-[#0a0f0c]"
+          className="absolute -left-4 -bottom-6 md:left-12 md:-bottom-8 lg:left-16 lg:-bottom-10 w-32 h-32 md:w-40 md:h-40 rounded-full bg-[#1a2a22] dark:bg-[#c5d5bf] flex flex-col items-center justify-center text-white dark:text-[#1a2a22] shadow-2xl p-4 scale-95 md:scale-100 z-20 border-4 border-surface dark:border-[#0a0f0c] will-change-transform"
         >
           <span className="material-symbols-outlined text-[18px] md:text-[22px] mb-1 opacity-90 text-[#faf8f4] dark:text-[#1a2a22]">
             domain_verification

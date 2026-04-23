@@ -115,10 +115,11 @@ html.dark #scroll-progress-bar {
 /* --- FLOATING ELEMENT --- */
 @keyframes float {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-12px); }
+    50% { transform: translateY(-8px); }
 }
 .animate-float {
-    animation: float 6s ease-in-out infinite;
+    animation: float 4s ease-in-out infinite;
+    will-change: transform;
 }
 
 /* --- NAVBAR DYNAMIC TRANSITIONS --- */
@@ -144,12 +145,18 @@ html.dark .navbar-scrolled {
         transition: none !important;
         transform: translate(0, 0) scale(1);
         /* Retain float animation, just disable reveal */
-        animation: float 8s ease-in-out infinite !important;
+        animation: float 4s ease-in-out infinite !important;
+        will-change: transform;
     }
     /* Don't shrink nav too much on mobile */
     .navbar-scrolled {
         padding-top: 1rem !important;
         padding-bottom: 1rem !important;
+    }
+    /* Optimize mobile animations */
+    * {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
     }
 }
 
