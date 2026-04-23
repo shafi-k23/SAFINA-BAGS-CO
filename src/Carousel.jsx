@@ -32,70 +32,37 @@ const products = [
   },
   {
     id: 4,
-    title: "School & College Bags",
-    subtitle: "INSTITUTIONAL",
-    desc: "Institutional bulk orders for education. Built for daily wear and tear with ergonomic support.",
-    image: null, // Dummy image card
+    title: "Daily Casual Backpacks",
+    subtitle: "EVERYDAY • LIGHTWEIGHT",
+    desc: "Perfect for daily commuters and casual use. Lightweight, durable, and stylish designs.",
+    image: "images/image-6.jpg",
   },
   {
     id: 5,
-    title: "Duffle & Gym Bags",
-    subtitle: "FITNESS • WELLNESS",
-    desc: "Fitness brands, corporate wellness programs, and sports teams. Ventilated and spacious.",
-    image: null,
+    title: "School & College Bags",
+    subtitle: "INSTITUTIONAL • ERGONOMIC",
+    desc: "Institutional bulk orders for education. Built for daily wear and tear with ergonomic support.",
+    image: "images/image-7.jpg",
   },
   {
     id: 6,
-    title: "Custom Design",
-    subtitle: "BESPOKE",
-    desc: "Fully bespoke designs from scratch to match your specific brand vision or functionality requirements.",
-    image: null,
+    title: "Laptop Backpacks",
+    subtitle: "TECH • SECURE",
+    desc: "Dedicated padded compartments for electronics. Ideal for students, tech workers, and professionals.",
+    image: "images/image-8.jpg",
   }
 ];
 
 // Duplicate for vast left/right scrolling
 const infiniteProducts = [...products, ...products, ...products, ...products, ...products];
 
-// --- 3D PRODUCT CARD ---
+// --- PRODUCT CARD (NO MOUSE 3D ROTATION) ---
 const ProductCard = ({ product }) => {
-  const boundingRef = useRef(null);
-
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  const mouseXSpring = useSpring(x, { stiffness: 100, damping: 25 });
-  const mouseYSpring = useSpring(y, { stiffness: 100, damping: 25 });
-
-  const rotateX = useTransform(mouseYSpring, [-0.25, 0.25], ["3deg", "-3deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.25, 0.25], ["-3deg", "3deg"]);
-
-  const handleMouseMove = (e) => {
-    if (!boundingRef.current || window.innerWidth < 1024) return;
-    const rect = boundingRef.current.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    
-    x.set((mouseX / width - 0.5) * 0.5);
-    y.set((mouseY / height - 0.5) * 0.5);
-  };
-
-  const handleMouseLeave = () => {
-    if (window.innerWidth < 1024) return;
-    x.set(0);
-    y.set(0);
-  };
-
   return (
-    <motion.div
-      ref={boundingRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{ rotateX, rotateY, transformStyle: "preserve-3d", perspective: 1000 }}
-      className="relative flex flex-col flex-shrink-0 h-full w-[82vw] sm:w-[260px] lg:w-[280px] xl:w-[300px] mx-3 md:mx-5 rounded-[24px] group bg-surface-container-lowest dark:bg-[#111916] border border-outline-variant/30 dark:border-white/10 shadow-sm hover:shadow-2xl hover:-translate-y-1 hover:border-[#1a2a22] dark:hover:border-[#c5d5bf] transition-all duration-500 will-change-transform"
+    <div
+      className="relative flex flex-col flex-shrink-0 h-full w-[82vw] sm:w-[260px] lg:w-[280px] xl:w-[300px] mx-3 md:mx-5 rounded-[24px] bg-surface-container-lowest dark:bg-[#111916] border border-outline-variant/30 dark:border-white/10 shadow-sm transition-all duration-500"
     >
-      <div style={{ transform: "translateZ(30px)", transformStyle: "preserve-3d" }} className="flex flex-col h-full rounded-[24px] overflow-hidden pointer-events-none">
+      <div className="flex flex-col h-full rounded-[24px] overflow-hidden pointer-events-none">
         
         {/* Top Image Box */}
         <div className="relative w-full aspect-[4/5] bg-[#f2f0ea] dark:bg-[#131b16] flex items-center justify-center border-b border-outline-variant/10 dark:border-white/5 overflow-hidden select-none">
@@ -104,7 +71,7 @@ const ProductCard = ({ product }) => {
               src={product.image} 
               alt={product.title} 
               draggable="false"
-              className="object-cover object-center w-full h-full group-hover:scale-[1.05] transition-transform duration-[800ms] pointer-events-none"
+              className="object-cover object-center w-full h-full pointer-events-none"
             />
           : (
             <div className="absolute inset-0 bg-[#c5d5bf] dark:bg-[#1c2620] flex items-center justify-center">
@@ -124,29 +91,13 @@ const ProductCard = ({ product }) => {
               </span>
             ))}
           </div>
-          <h3 className="text-xl md:text-2xl font-headline text-[#1a2a22] dark:text-white mb-2 leading-tight pointer-events-auto">
+          <h3 className="text-xl md:text-2xl font-headline text-[#1a2a22] dark:text-white leading-tight pointer-events-auto pb-4">
             {product.title}
           </h3>
-          <p className="text-sm font-body text-[#454e47] dark:text-[#8a9589] leading-relaxed flex-grow line-clamp-3 pointer-events-auto">
-            {product.desc}
-          </p>
-          
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              window.prefillForm && window.prefillForm(product.title);
-              document.getElementById('contact')?.scrollIntoView({behavior: 'smooth'})
-            }}
-            className="mt-6 flex items-center space-x-2 text-[11px] font-bold tracking-[0.15em] uppercase text-[#454e47] dark:text-[#8a9589] hover:text-[#1a2a22] dark:hover:text-white transition-colors duration-300 pointer-events-auto group/btn"
-          >
-            <span>Get Quote for This Line</span>
-            <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1.5 transition-transform duration-300" />
-          </button>
         </div>
 
       </div>
-    </motion.div>
+    </div>
   );
 };
 
@@ -156,33 +107,58 @@ export default function Carousel() {
   const [startX, setStartX] = useState(0);
   const [scrollLeftPos, setScrollLeftPos] = useState(0);
 
-  // Initialize loop in the middle
+  const productSetCount = 5; 
+  
+  // Clean continuous scroll handle without jumping glitches
+  const handleScroll = () => {
+    if (!containerRef.current || isDragging) return; 
+    const track = containerRef.current;
+    
+    // Calculate the width of one exact set of products (6 products)
+    const singleSetWidth = track.scrollWidth / productSetCount;
+    
+    // Prevent snap jump glitch by snapping back cleanly exactly one full set distance
+    if (track.scrollLeft < singleSetWidth) {
+      track.style.scrollBehavior = 'auto';
+      track.scrollLeft += singleSetWidth * 2; 
+    } 
+    else if (track.scrollLeft > track.scrollWidth - (singleSetWidth * 2)) {
+      track.style.scrollBehavior = 'auto';
+      track.scrollLeft -= singleSetWidth * 2;
+    }
+  };
+
   useEffect(() => {
     if (containerRef.current) {
-        // Find approximate center of the 5-cloned array (jump to set 3)
         const track = containerRef.current;
-        const middleOffset = (track.scrollWidth / 5) * 2; 
+        const middleOffset = (track.scrollWidth / productSetCount) * 2; 
+        track.style.scrollBehavior = 'auto'; 
         track.scrollLeft = middleOffset;
     }
   }, []);
 
-  // Desktop Mouse Drag Controls
   const handleMouseDown = (e) => {
     setIsDragging(true);
     setStartX(e.pageX - containerRef.current.offsetLeft);
     setScrollLeftPos(containerRef.current.scrollLeft);
+    containerRef.current.style.scrollBehavior = 'auto'; // Remove smooth scroll when dragging
   };
+  
   const handleMouseMove = (e) => {
     if (!isDragging) return;
     e.preventDefault();
     const x = e.pageX - containerRef.current.offsetLeft;
-    const walk = (x - startX) * 1.5; // Drag speed multiplier
+    const walk = (x - startX) * 1.5; 
     containerRef.current.scrollLeft = scrollLeftPos - walk;
   };
-  const handleMouseUp = () => setIsDragging(false);
+  
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
 
   const scrollLeft = () => {
     if (containerRef.current) {
+      containerRef.current.style.scrollBehavior = 'smooth';
       const cardWidth = window.innerWidth < 1024 ? window.innerWidth * 0.82 : (window.innerWidth >= 1280 ? 340 : 320);
       containerRef.current.scrollBy({ left: -cardWidth, behavior: 'smooth' });
     }
@@ -190,6 +166,7 @@ export default function Carousel() {
 
   const scrollRight = () => {
     if (containerRef.current) {
+      containerRef.current.style.scrollBehavior = 'smooth';
       const cardWidth = window.innerWidth < 1024 ? window.innerWidth * 0.82 : (window.innerWidth >= 1280 ? 340 : 320);
       containerRef.current.scrollBy({ left: cardWidth, behavior: 'smooth' });
     }
@@ -226,6 +203,7 @@ export default function Carousel() {
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
+          onScroll={handleScroll}
           className={cn(
             "flex flex-row items-stretch overflow-x-auto overflow-y-hidden px-[calc(50vw-41vw)] sm:px-[calc(50vw-130px)] lg:px-[calc(50vw-140px)] xl:px-[calc(50vw-150px)] py-12 -my-6 transition-all",
             isDragging ? "cursor-grabbing snap-none" : "cursor-grab snap-x snap-mandatory"
