@@ -21,6 +21,18 @@ export default function FloatingWhatsApp() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isOpen]);
 
+  // Prevent background scrolling when chat is open on mobile
+  useEffect(() => {
+    if (isOpen && window.innerWidth < 768) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   const handleSend = (e) => {
     e.preventDefault();
     const textToSend = message.trim() || 'Hi Safina Bags, I am interested in bulk bags.';
@@ -87,7 +99,7 @@ export default function FloatingWhatsApp() {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Enter Your Message..."
-                    className="flex-1 px-4 py-2.5 text-sm bg-white dark:bg-gray-800 border-none rounded-full focus:ring-1 focus:ring-[#0b9a6d] dark:text-white shadow-sm"
+                    className="flex-1 px-4 py-2.5 text-base bg-white dark:bg-gray-800 border-none rounded-full focus:ring-1 focus:ring-[#0b9a6d] dark:text-white shadow-sm"
                   />
                   <button
                     type="submit"
