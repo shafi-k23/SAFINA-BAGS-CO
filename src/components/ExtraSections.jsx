@@ -2,10 +2,19 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 export default function ExtraSections() {
-  const factoryItems = [
-    { icon: 'videocam', label: 'Video / Image Pending' },
-    { icon: 'factory', label: 'Factory Floor Image Pending' },
-    { icon: 'precision_manufacturing', label: 'Machinery Image Pending' },
+  const factoryColumns = [
+    [
+      { type: 'video', src: '', icon: 'precision_manufacturing', label: 'Cutting Machine Video Pending', orientation: 'vertical' },
+      { type: 'video', src: 'images/stitching-video1-horizontal.mp4', icon: 'videocam', label: 'Stitching Video 1', orientation: 'horizontal' }
+    ],
+    [
+      { type: 'image', src: 'images/factory-layout-horizontal.png', icon: 'factory', label: 'Factory Layout Photo', orientation: 'horizontal' },
+      { type: 'image', src: 'images/factory-layout-vertical.png', icon: 'factory', label: 'Factory Machinery Photo', orientation: 'vertical' }
+    ],
+    [
+      { type: 'image', src: 'images/quality%20check%20vertical.png', icon: 'verified', label: 'Quality Checking Photo', orientation: 'vertical' },
+      { type: 'video', src: 'images/stitching%20video2-horizontal.mp4', icon: 'videocam', label: 'Stitching Video 2', orientation: 'horizontal' }
+    ]
   ];
 
   const brandingOptions = [
@@ -41,19 +50,47 @@ export default function ExtraSections() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {factoryItems.map((item, idx) => (
-            <motion.div 
-              key={idx}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className="group relative w-full aspect-video md:aspect-square overflow-hidden bg-[#c5d5bf] dark:bg-[#1c2620] rounded-2xl flex flex-col items-center justify-center shadow-sm border border-outline-variant/20 dark:border-white/5 transition-transform duration-500 md:hover:-translate-y-2 md:hover:shadow-xl"
-            >
-              <span className="material-symbols-outlined text-[32px] text-[#454e47] dark:text-[#8a9589] mb-2 opacity-50 transition-transform group-hover:scale-110 duration-300">{item.icon}</span>
-              <span className="text-[#454e47] dark:text-[#8a9589] font-body text-[10px] md:text-xs tracking-widest uppercase opacity-70 px-4 text-center">{item.label}</span>
-            </motion.div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+          {factoryColumns.map((col, colIdx) => (
+            <div key={colIdx} className="flex flex-col gap-4 md:gap-6">
+              {col.map((item, itemIdx) => (
+                <motion.div 
+                  key={itemIdx}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.5, delay: (colIdx * 0.1) + (itemIdx * 0.1) }}
+                  className={`group relative w-full overflow-hidden bg-[#c5d5bf] dark:bg-[#1c2620] rounded-2xl flex flex-col items-center justify-center shadow-sm border border-outline-variant/20 dark:border-white/5 transition-transform duration-500 md:hover:-translate-y-1 md:hover:shadow-xl ${item.orientation === 'vertical' ? 'aspect-[3/4]' : 'aspect-video'}`}
+                >
+                  {item.src ? (
+                    item.type === 'video' ? (
+                      <video 
+                        src={item.src} 
+                        className="absolute inset-0 w-full h-full object-cover" 
+                        autoPlay 
+                        loop 
+                        muted 
+                        playsInline 
+                        preload="metadata"
+                      />
+                    ) : (
+                      <img 
+                        src={item.src} 
+                        alt={item.label} 
+                        className="absolute inset-0 w-full h-full object-cover" 
+                        loading="lazy"
+                      />
+                    )
+                  ) : (
+                    <div className="flex flex-col items-center justify-center space-y-2 z-10 relative">
+                      <span className="material-symbols-outlined text-[32px] text-[#454e47] dark:text-[#8a9589] opacity-50 transition-transform group-hover:scale-110 duration-300">{item.icon}</span>
+                      <span className="text-[#454e47] dark:text-[#8a9589] font-body text-[10px] md:text-xs tracking-widest uppercase opacity-70 px-4 text-center">{item.label}</span>
+                      <span className="text-[9px] font-bold opacity-40 uppercase tracking-[0.2em] bg-black/5 dark:bg-white/5 px-2 py-1 rounded-md mt-2">{item.orientation}</span>
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+            </div>
           ))}
         </div>
       </section>
