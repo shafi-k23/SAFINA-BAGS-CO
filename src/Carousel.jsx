@@ -53,8 +53,8 @@ const products = [
   }
 ];
 
-// Duplicate for vast left/right scrolling
-const infiniteProducts = [...products, ...products, ...products, ...products, ...products];
+// Duplicate for vast left/right scrolling (10 sets for buffer)
+const infiniteProducts = Array(10).fill(products).flat();
 
 // --- PRODUCT CARD (NO MOUSE 3D ROTATION) ---
 const ProductCard = ({ product }) => {
@@ -106,35 +106,51 @@ export default function Carousel() {
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeftPos, setScrollLeftPos] = useState(0);
+  const scrollTimeoutRef = useRef(null);
 
-  const productSetCount = 5; 
+  const productSetCount = 10; // Increased to provide a massive buffer so users rarely even trigger the reset
   
-  // Clean continuous scroll handle without jumping glitches
+  // True seamless loop: wait for scroll momentum to completely stop before repositioning
   const handleScroll = () => {
     if (!containerRef.current || isDragging) return; 
-    const track = containerRef.current;
     
-    // Calculate the width of one exact set of products (6 products)
-    const singleSetWidth = track.scrollWidth / productSetCount;
-    
-    // Prevent snap jump glitch by snapping back cleanly exactly one full set distance
-    if (track.scrollLeft < singleSetWidth) {
-      track.style.scrollBehavior = 'auto';
-      track.scrollLeft += singleSetWidth * 2; 
-    } 
-    else if (track.scrollLeft > track.scrollWidth - (singleSetWidth * 2)) {
-      track.style.scrollBehavior = 'auto';
-      track.scrollLeft -= singleSetWidth * 2;
+    // Clear any pending scroll timeouts
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
     }
+    
+    // Set a debounce timeout to only jump the scroll position when the user has stopped swiping
+    scrollTimeoutRef.current = setTimeout(() => {
+      const track = containerRef.current;
+      if (!track) return;
+      
+      const singleSetWidth = track.scrollWidth / productSetCount;
+      
+      // If we got too close to the left edge
+      if (track.scrollLeft < singleSetWidth * 2) {
+        track.style.scrollBehavior = 'auto'; // Prevent animation glitch
+        track.scrollLeft += singleSetWidth * 4; 
+      } 
+      // If we got too close to the right edge
+      else if (track.scrollLeft > track.scrollWidth - (singleSetWidth * 3)) {
+        track.style.scrollBehavior = 'auto'; // Prevent animation glitch
+        track.scrollLeft -= singleSetWidth * 4;
+      }
+    }, 150); // Wait 150ms after the last scroll event (when momentum dies/ends)
   };
 
   useEffect(() => {
     if (containerRef.current) {
         const track = containerRef.current;
-        const middleOffset = (track.scrollWidth / productSetCount) * 2; 
+        const middleOffset = (track.scrollWidth / productSetCount) * 4; 
         track.style.scrollBehavior = 'auto'; 
         track.scrollLeft = middleOffset;
     }
+    
+    // Cleanup timeout on unmount
+    return () => {
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    };
   }, []);
 
   const handleMouseDown = (e) => {
@@ -214,10 +230,10 @@ export default function Carousel() {
             <motion.div 
               key={`${product.id}-${idx}`} 
               className="snap-center pointer-events-auto flex-shrink-0 flex items-stretch h-auto"
-              initial={{ opacity: 0.8, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: false, amount: 0.3 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
+              initial={{ scale: 0.95 }}
+              whileInView={{ scale: 1 }}
+              viewport={{ once: false, amount: 0.5 }}
+              transition={{ duration: 0.3 }}
             >
                 <ProductCard product={product} />
             </motion.div>
