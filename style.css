@@ -237,15 +237,4 @@ html.dark .navbar-scrolled {
     }
 }
 
-/* DESKTOP (lg+): smooth opacity depth driven by JS — transitions for settle */
-@media (min-width: 1024px) {
-    .carousel-slide-inner {
-        transition: opacity 0.3s ease-out, filter 0.3s ease-out;
-    }
-
-    /* During active drag, disable transitions for instant response */
-    .carousel-viewport.carousel-dragging .carousel-slide-inner {
-        transition: none !important;
-    }
-}
 

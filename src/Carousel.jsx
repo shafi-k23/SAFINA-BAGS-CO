@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -97,10 +97,6 @@ const ProductCard = ({ product }) => {
   );
 };
 
-// Detect mobile/tablet once
-const isMobileQuery = () =>
-  typeof window !== "undefined" && window.matchMedia("(max-width: 1023px)").matches;
-
 export default function Carousel() {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
@@ -117,82 +113,6 @@ export default function Carousel() {
   const wheelTimeoutRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
-  const rafRef = useRef(null);
-  const slideRefs = useRef([]);
-
-  // Detect mobile on mount + resize
-  useEffect(() => {
-    const check = () => setIsMobile(isMobileQuery());
-    check();
-    window.addEventListener("resize", check, { passive: true });
-    return () => window.removeEventListener("resize", check);
-  }, []);
-
-  // Apply per-slide opacity via CSS custom properties driven by Embla's scroll progress
-  // This avoids React re-renders during drag — pure DOM updates in a rAF loop
-  const updateSlideStyles = useCallback(() => {
-    if (!emblaApi || isMobile) return;
-
-    const engine = emblaApi.internalEngine();
-    const scrollProgress = emblaApi.scrollProgress();
-    const slidesInView = emblaApi.slidesInView();
-
-    emblaApi.scrollSnapList().forEach((snapPoint, index) => {
-      const el = slideRefs.current[index];
-      if (!el) return;
-
-      // Calculate how far this slide is from the current scroll position
-      let diffToTarget = snapPoint - scrollProgress;
-
-      // Handle loop wrapping
-      const slidesCount = emblaApi.scrollSnapList().length;
-      if (engine.options.loop) {
-        // Normalize the diff to be in [-0.5, 0.5] range
-        while (diffToTarget > 0.5) diffToTarget -= 1;
-        while (diffToTarget < -0.5) diffToTarget += 1;
-      }
-
-      const distance = Math.abs(diffToTarget);
-      // Map distance to opacity: center = 1, one away ~0.6, far ~0.2
-      const normalizedDist = distance * slidesCount;
-      let opacity, blur;
-      if (normalizedDist < 0.5) {
-        opacity = 1;
-        blur = 0;
-      } else if (normalizedDist < 1.5) {
-        opacity = 0.6;
-        blur = 0;
-      } else {
-        opacity = 0.2;
-        blur = 1.5;
-      }
-
-      el.style.opacity = opacity;
-      el.style.filter = blur > 0 ? `blur(${blur}px)` : "none";
-    });
-  }, [emblaApi, isMobile]);
-
-  // rAF loop for smooth style updates during scroll (desktop only)
-  useEffect(() => {
-    if (!emblaApi || isMobile) return;
-
-    const onScroll = () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(updateSlideStyles);
-    };
-
-    emblaApi.on("scroll", onScroll);
-    emblaApi.on("reInit", onScroll);
-    // Initial paint
-    updateSlideStyles();
-
-    return () => {
-      emblaApi.off("scroll", onScroll);
-      emblaApi.off("reInit", onScroll);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, [emblaApi, isMobile, updateSlideStyles]);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -299,11 +219,7 @@ export default function Carousel() {
                     "xl:flex-[0_0_28%]"
                   )}
                 >
-                  <div
-                    ref={(el) => (slideRefs.current[index] = el)}
-                    className="carousel-slide-inner"
-                    style={isMobile ? undefined : undefined}
-                  >
+                  <div className="carousel-slide-inner">
                     <ProductCard product={product} />
                   </div>
                 </div>
