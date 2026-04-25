@@ -104,7 +104,7 @@ export default function Carousel() {
     dragFree: false,
     containScroll: false,
     skipSnaps: false,
-    duration: 12,
+    duration: 20,
     slidesToScroll: 1,
     watchDrag: true,
   });

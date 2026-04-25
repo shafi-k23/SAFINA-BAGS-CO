@@ -158,14 +158,10 @@ html.dark .navbar-scrolled {
 
 /* --- CAROUSEL SLIDE TRANSITIONS --- */
 .carousel-slide-inner {
-    transition: opacity 0.25s ease-out,
-                transform 0.25s ease-out,
-                filter 0.25s ease-out;
-    will-change: opacity, transform;
+    transition: opacity 0.35s ease-out, filter 0.35s ease-out;
+    will-change: opacity;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    transform: scale(1);
-    transform-origin: center center;
 }
 
 .carousel-viewport {
@@ -181,17 +177,10 @@ html.dark .navbar-scrolled {
         will-change: auto;
         filter: none !important;
     }
-    .carousel-slide-inner.mobile-neighbor {
-        opacity: 1;
-        transform: scale(1);
-    }
-    .carousel-slide-inner.mobile-far {
-        opacity: 1;
-        transform: scale(1);
-    }
+    .carousel-slide-inner.mobile-neighbor,
+    .carousel-slide-inner.mobile-far,
     .carousel-slide-inner.mobile-active {
         opacity: 1 !important;
-        transform: scale(1) !important;
     }
     .carousel-viewport.carousel-dragging .carousel-slide-inner {
         transition: none !important;
@@ -199,25 +188,18 @@ html.dark .navbar-scrolled {
     }
 }
 
-/* Desktop (lg+): smooth depth effect with buttery transitions */
+/* Desktop (lg+): opacity-only depth effect — no scale, no shake */
 @media (min-width: 1024px) {
     .carousel-slide-inner.mobile-active {
         opacity: 1 !important;
-        transform: scale(1.02) !important;
         filter: none !important;
     }
     .carousel-slide-inner.mobile-neighbor {
-        opacity: 0.7;
-        transform: scale(0.96);
+        opacity: 0.6;
     }
     .carousel-slide-inner.mobile-far {
-        opacity: 0.25;
-        transform: scale(0.90);
+        opacity: 0.2;
         filter: blur(1.5px);
     }
-
-    /* While dragging on desktop, speed up transitions to follow the cursor */
-    .carousel-viewport.carousel-dragging .carousel-slide-inner {
-        transition-duration: 0.2s;
-    }
 }
+
