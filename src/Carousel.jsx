@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -53,8 +52,9 @@ const products = [
   }
 ];
 
-// Duplicate for vast left/right scrolling (10 sets for buffer)
-const infiniteProducts = Array(10).fill(products).flat();
+// Use three sets and keep the user in the middle set for a seamless infinite loop.
+const LOOP_SET_COUNT = 3;
+const infiniteProducts = Array(LOOP_SET_COUNT).fill(products).flat();
 
 // --- PRODUCT CARD (NO MOUSE 3D ROTATION) ---
 const ProductCard = ({ product }) => {
@@ -106,50 +106,59 @@ export default function Carousel() {
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeftPos, setScrollLeftPos] = useState(0);
-  const scrollTimeoutRef = useRef(null);
+  const rafRef = useRef(null);
 
-  const productSetCount = 10; // Increased to provide a massive buffer so users rarely even trigger the reset
-  
-  // True seamless loop: wait for scroll momentum to completely stop before repositioning
-  const handleScroll = () => {
-    if (!containerRef.current || isDragging) return; 
-    
-    // Clear any pending scroll timeouts
-    if (scrollTimeoutRef.current) {
-      clearTimeout(scrollTimeoutRef.current);
-    }
-    
-    // Set a debounce timeout to only jump the scroll position when the user has stopped swiping
-    scrollTimeoutRef.current = setTimeout(() => {
-      const track = containerRef.current;
-      if (!track) return;
-      
-      const singleSetWidth = track.scrollWidth / productSetCount;
-      
-      // If we got too close to the left edge
-      if (track.scrollLeft < singleSetWidth * 2) {
-        track.style.scrollBehavior = 'auto'; // Prevent animation glitch
-        track.scrollLeft += singleSetWidth * 4; 
-      } 
-      // If we got too close to the right edge
-      else if (track.scrollLeft > track.scrollWidth - (singleSetWidth * 3)) {
-        track.style.scrollBehavior = 'auto'; // Prevent animation glitch
-        track.scrollLeft -= singleSetWidth * 4;
+  const recenterToMiddleSet = () => {
+    const track = containerRef.current;
+    if (!track) return;
+
+    const singleSetWidth = track.scrollWidth / LOOP_SET_COUNT;
+    if (!singleSetWidth) return;
+
+    const minAllowed = singleSetWidth * 0.5;
+    const maxAllowed = singleSetWidth * 1.5;
+
+    if (track.scrollLeft < minAllowed || track.scrollLeft > maxAllowed) {
+      const prevBehavior = track.style.scrollBehavior;
+      track.style.scrollBehavior = "auto";
+      if (track.scrollLeft < minAllowed) {
+        track.scrollLeft += singleSetWidth;
+      } else {
+        track.scrollLeft -= singleSetWidth;
       }
-    }, 150); // Wait 150ms after the last scroll event (when momentum dies/ends)
+      track.style.scrollBehavior = prevBehavior;
+    }
+  };
+
+  const handleScroll = () => {
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+    }
+
+    rafRef.current = requestAnimationFrame(() => {
+      recenterToMiddleSet();
+      rafRef.current = null;
+    });
   };
 
   useEffect(() => {
-    if (containerRef.current) {
-        const track = containerRef.current;
-        const middleOffset = (track.scrollWidth / productSetCount) * 4; 
-        track.style.scrollBehavior = 'auto'; 
-        track.scrollLeft = middleOffset;
-    }
-    
-    // Cleanup timeout on unmount
+    const track = containerRef.current;
+    if (!track) return;
+
+    const centerTrack = () => {
+      const singleSetWidth = track.scrollWidth / LOOP_SET_COUNT;
+      track.style.scrollBehavior = "auto";
+      track.scrollLeft = singleSetWidth;
+    };
+
+    centerTrack();
+    window.addEventListener("resize", centerTrack);
+
     return () => {
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
+      window.removeEventListener("resize", centerTrack);
     };
   }, []);
 
@@ -221,22 +230,18 @@ export default function Carousel() {
           onMouseLeave={handleMouseUp}
           onScroll={handleScroll}
           className={cn(
-            "flex flex-row items-stretch overflow-x-auto overflow-y-hidden px-[calc(50vw-41vw)] sm:px-[calc(50vw-130px)] lg:px-[calc(50vw-140px)] xl:px-[calc(50vw-150px)] py-12 -my-6 transition-all",
+            "flex flex-row items-stretch overflow-x-auto overflow-y-hidden px-[calc(50vw-41vw)] sm:px-[calc(50vw-130px)] lg:px-[calc(50vw-140px)] xl:px-[calc(50vw-150px)] py-12 -my-6 transition-all touch-pan-x",
             isDragging ? "cursor-grabbing snap-none" : "cursor-grab snap-x snap-mandatory"
           )}
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {infiniteProducts.map((product, idx) => (
-            <motion.div 
+            <div 
               key={`${product.id}-${idx}`} 
               className="snap-center pointer-events-auto flex-shrink-0 flex items-stretch h-auto"
-              initial={{ scale: 0.95 }}
-              whileInView={{ scale: 1 }}
-              viewport={{ once: false, amount: 0.5 }}
-              transition={{ duration: 0.3 }}
             >
                 <ProductCard product={product} />
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

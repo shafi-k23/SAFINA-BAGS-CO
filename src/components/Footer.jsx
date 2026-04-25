@@ -20,7 +20,7 @@ export default function Footer() {
             B2B backpack manufacturing. Dedicated to scalable production, enterprise quality, and reliable delivery from Bengaluru.
           </p>
           <div className="flex items-center space-x-4">
-            <a href="https://safinabagsco.me" target="_blank" rel="noopener noreferrer" aria-label="Website" className="w-10 h-10 rounded-full border border-[#5c5f5b] dark:border-[#a1a5a2]/20 flex items-center justify-center hover:bg-[#5c5f5b] hover:text-white transition-all text-[#5c5f5b] dark:text-[#a1a5a2]">
+            <a href="https://safinabags.com" target="_blank" rel="noopener noreferrer" aria-label="Website" className="w-10 h-10 rounded-full border border-[#5c5f5b] dark:border-[#a1a5a2]/20 flex items-center justify-center hover:bg-[#5c5f5b] hover:text-white transition-all text-[#5c5f5b] dark:text-[#a1a5a2]">
               <span className="material-symbols-outlined text-lg">language</span>
             </a>
             <a href="mailto:safinabagsco@gmail.com" aria-label="Email" className="w-10 h-10 rounded-full border border-[#5c5f5b] dark:border-[#a1a5a2]/20 flex items-center justify-center hover:bg-[#5c5f5b] hover:text-white transition-all text-[#5c5f5b] dark:text-[#a1a5a2]">

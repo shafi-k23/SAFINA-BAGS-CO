@@ -7,6 +7,7 @@ import WhyChoose from './components/WhyChoose';
 import Manufacturing from './components/Manufacturing';
 import ExtraSections from './components/ExtraSections';
 import ContactFAQ from './components/ContactFAQ';
+import CatalogueHighlight from './components/CatalogueHighlight';
 import Footer from './components/Footer';
 import FloatingWhatsApp from './components/FloatingWhatsApp';
 
@@ -25,6 +26,7 @@ function App() {
         <div id="products" className="my-2 md:my-4">
           <Carousel />
         </div>
+        <CatalogueHighlight />
 
         <WhyChoose />
         <Manufacturing />
