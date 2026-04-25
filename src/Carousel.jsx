@@ -104,6 +104,8 @@ const ProductCard = ({ product }) => {
 export default function Carousel() {
   const containerRef = useRef(null);
   const prevSingleSetWidthRef = useRef(0);
+  const isProgrammaticSnapRef = useRef(false);
+  const snapTimeoutRef = useRef(null);
   const touchStateRef = useRef({
     startX: 0,
     startY: 0,
@@ -131,23 +133,26 @@ export default function Carousel() {
     const track = containerRef.current;
     if (!track) return;
 
-    const singleSetWidth = track.scrollWidth / LOOP_SET_COUNT;
-    if (!singleSetWidth) return;
-
     const stepWidth = getStepWidth(track);
-    const maxIndex = Math.max(0, products.length - 1);
-    const logicalOffset = ((track.scrollLeft % singleSetWidth) + singleSetWidth) % singleSetWidth;
-    const currentIndex = logicalOffset / stepWidth;
+    const currentIndex = track.scrollLeft / stepWidth;
 
     let targetIndex = Math.round(currentIndex);
     if (Math.abs(velocityX) > 0.35) {
       targetIndex += velocityX < 0 ? 1 : -1;
     }
 
-    targetIndex = Math.max(0, Math.min(maxIndex, targetIndex));
-
+    isProgrammaticSnapRef.current = true;
     track.style.scrollBehavior = "smooth";
-    track.scrollLeft = singleSetWidth + (targetIndex * stepWidth);
+    track.scrollLeft = targetIndex * stepWidth;
+
+    if (snapTimeoutRef.current) {
+      clearTimeout(snapTimeoutRef.current);
+    }
+
+    snapTimeoutRef.current = setTimeout(() => {
+      isProgrammaticSnapRef.current = false;
+      recenterToMiddleSet();
+    }, 380);
   };
 
   const recenterToMiddleSet = () => {
@@ -173,6 +178,8 @@ export default function Carousel() {
   };
 
   const handleScroll = () => {
+    if (isProgrammaticSnapRef.current) return;
+
     if (rafRef.current) {
       cancelAnimationFrame(rafRef.current);
     }
@@ -214,6 +221,9 @@ export default function Carousel() {
     return () => {
       if (rafRef.current) {
         cancelAnimationFrame(rafRef.current);
+      }
+      if (snapTimeoutRef.current) {
+        clearTimeout(snapTimeoutRef.current);
       }
       window.removeEventListener("resize", preserveTrackPositionOnResize);
     };
