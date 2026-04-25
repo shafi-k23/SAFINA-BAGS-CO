@@ -56,7 +56,7 @@ const products = [
 const ProductCard = ({ product }) => {
   return (
     <div
-      className="relative flex flex-col h-full w-full rounded-[24px] bg-surface-container-lowest dark:bg-[#111916] border border-outline-variant/30 dark:border-white/10 shadow-sm transition-all duration-500"
+      className="relative flex flex-col h-full w-full rounded-[24px] bg-surface-container-lowest dark:bg-[#111916] border border-outline-variant/30 dark:border-white/10 shadow-sm carousel-card"
     >
       <div className="flex flex-col h-full rounded-[24px] overflow-hidden pointer-events-none">
         
@@ -108,7 +108,7 @@ export default function Carousel() {
     dragFree: false,
     containScroll: false,
     skipSnaps: false,
-    duration: 25,
+    duration: 30,
     slidesToScroll: 1,
     watchDrag: true,
   });

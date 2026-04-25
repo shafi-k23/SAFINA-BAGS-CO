@@ -158,6 +158,11 @@ html.dark .navbar-scrolled {
 
 /* --- CAROUSEL: GPU-ACCELERATED SMOOTH SCROLLING --- */
 
+/* Card: NO transition-all — only transition specific properties for dark mode */
+.carousel-card {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
 /* Force every slide onto its own GPU layer for zero-jitter scrolling */
 .carousel-slide {
     -webkit-backface-visibility: hidden;
@@ -165,6 +170,7 @@ html.dark .navbar-scrolled {
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
     will-change: transform;
+    contain: layout style paint;
 }
 
 .carousel-slide-inner {
@@ -206,6 +212,15 @@ html.dark .navbar-scrolled {
         filter: none !important;
         transition: none !important;
         will-change: auto;
+    }
+
+    /* Kill ALL transitions inside carousel cards on mobile */
+    .carousel-card,
+    .carousel-card *,
+    .carousel-slide-inner,
+    .carousel-slide-inner * {
+        transition: none !important;
+        animation: none !important;
     }
 
     .carousel-viewport.carousel-dragging .carousel-slide-inner {
