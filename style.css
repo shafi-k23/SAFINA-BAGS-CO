@@ -163,61 +163,7 @@ html.dark .navbar-scrolled {
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
-/* ==============================================
-   MOBILE: Native CSS scroll-snap carousel
-   Uses browser compositor thread — butter smooth
-   ============================================== */
-.mobile-carousel-viewport {
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
-    scroll-behavior: smooth;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    overscroll-behavior-x: contain;
-    padding: 12px 0;
-}
-
-.mobile-carousel-viewport::-webkit-scrollbar {
-    display: none;
-}
-
-.mobile-carousel-track {
-    display: flex;
-    gap: 12px;
-    /* Left/right padding centers the first/last card */
-    padding: 0 7.5%;
-}
-
-.mobile-carousel-slide {
-    flex: 0 0 85%;
-    min-width: 0;
-    scroll-snap-align: center;
-    scroll-snap-stop: always;
-}
-
-/* Kill ALL transitions/animations inside mobile carousel */
-.mobile-carousel-slide,
-.mobile-carousel-slide *,
-.mobile-carousel-slide .carousel-card,
-.mobile-carousel-slide .carousel-card * {
-    transition: none !important;
-    animation: none !important;
-}
-
-.mobile-carousel-slide img {
-    -webkit-user-drag: none;
-    user-drag: none;
-    -webkit-touch-callout: none;
-    pointer-events: none;
-}
-
-/* ==============================================
-   DESKTOP: Embla carousel with opacity effects
-   ============================================== */
-
-/* Force every slide onto its own GPU layer */
+/* Force every slide onto its own GPU layer for zero-jitter scrolling */
 .carousel-slide {
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
@@ -232,7 +178,6 @@ html.dark .navbar-scrolled {
     backface-visibility: hidden;
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
-    transition: opacity 0.3s ease-out, filter 0.3s ease-out;
 }
 
 .carousel-container {
@@ -246,6 +191,7 @@ html.dark .navbar-scrolled {
     overscroll-behavior-x: none;
     overscroll-behavior: none;
     -ms-scroll-chaining: none;
+    -webkit-overflow-scrolling: touch;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     -webkit-transform: translate3d(0, 0, 0);
@@ -259,8 +205,47 @@ html.dark .navbar-scrolled {
     user-select: none;
 }
 
-/* During active drag, disable transitions for instant response */
-.carousel-viewport.carousel-dragging .carousel-slide-inner {
-    transition: none !important;
+/* MOBILE: completely static slides — zero transitions, zero re-paints during swipe */
+@media (max-width: 1023px) {
+    .carousel-slide-inner {
+        opacity: 1 !important;
+        filter: none !important;
+        transition: none !important;
+        will-change: auto;
+    }
+
+    /* Kill ALL transitions inside carousel cards on mobile */
+    .carousel-card,
+    .carousel-card *,
+    .carousel-slide-inner,
+    .carousel-slide-inner * {
+        transition: none !important;
+        animation: none !important;
+    }
+
+    .carousel-viewport.carousel-dragging .carousel-slide-inner {
+        transition: none !important;
+        filter: none !important;
+    }
+
+    /* Prevent image dragging/ghosting on touch */
+    .carousel-slide-inner img {
+        -webkit-user-drag: none;
+        user-drag: none;
+        -webkit-touch-callout: none;
+        pointer-events: none;
+    }
+}
+
+/* DESKTOP (lg+): smooth opacity depth driven by JS — transitions for settle */
+@media (min-width: 1024px) {
+    .carousel-slide-inner {
+        transition: opacity 0.3s ease-out, filter 0.3s ease-out;
+    }
+
+    /* During active drag, disable transitions for instant response */
+    .carousel-viewport.carousel-dragging .carousel-slide-inner {
+        transition: none !important;
+    }
 }
 

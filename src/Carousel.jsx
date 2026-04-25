@@ -52,7 +52,7 @@ const products = [
   }
 ];
 
-// --- PRODUCT CARD ---
+// --- PRODUCT CARD (NO MOUSE 3D ROTATION) ---
 const ProductCard = ({ product }) => {
   return (
     <div
@@ -97,27 +97,11 @@ const ProductCard = ({ product }) => {
   );
 };
 
-// ============================================================
-// MOBILE CAROUSEL — Native CSS scroll-snap (hardware-accelerated)
-// ============================================================
-const MobileCarousel = () => {
-  return (
-    <div className="mobile-carousel-viewport">
-      <div className="mobile-carousel-track">
-        {products.map((product) => (
-          <div key={product.id} className="mobile-carousel-slide">
-            <ProductCard product={product} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
+// Detect mobile/tablet once
+const isMobileQuery = () =>
+  typeof window !== "undefined" && window.matchMedia("(max-width: 1023px)").matches;
 
-// ============================================================
-// DESKTOP CAROUSEL — Embla (opacity effects + wheel/trackpad)
-// ============================================================
-const DesktopCarousel = () => {
+export default function Carousel() {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: "center",
@@ -133,28 +117,44 @@ const DesktopCarousel = () => {
   const wheelTimeoutRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
   const rafRef = useRef(null);
   const slideRefs = useRef([]);
 
-  // Apply per-slide opacity via direct DOM updates (no React re-renders)
+  // Detect mobile on mount + resize
+  useEffect(() => {
+    const check = () => setIsMobile(isMobileQuery());
+    check();
+    window.addEventListener("resize", check, { passive: true });
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // Apply per-slide opacity via CSS custom properties driven by Embla's scroll progress
+  // This avoids React re-renders during drag — pure DOM updates in a rAF loop
   const updateSlideStyles = useCallback(() => {
-    if (!emblaApi) return;
+    if (!emblaApi || isMobile) return;
 
     const engine = emblaApi.internalEngine();
     const scrollProgress = emblaApi.scrollProgress();
+    const slidesInView = emblaApi.slidesInView();
 
     emblaApi.scrollSnapList().forEach((snapPoint, index) => {
       const el = slideRefs.current[index];
       if (!el) return;
 
+      // Calculate how far this slide is from the current scroll position
       let diffToTarget = snapPoint - scrollProgress;
+
+      // Handle loop wrapping
       const slidesCount = emblaApi.scrollSnapList().length;
       if (engine.options.loop) {
+        // Normalize the diff to be in [-0.5, 0.5] range
         while (diffToTarget > 0.5) diffToTarget -= 1;
         while (diffToTarget < -0.5) diffToTarget += 1;
       }
 
       const distance = Math.abs(diffToTarget);
+      // Map distance to opacity: center = 1, one away ~0.6, far ~0.2
       const normalizedDist = distance * slidesCount;
       let opacity, blur;
       if (normalizedDist < 0.5) {
@@ -171,11 +171,11 @@ const DesktopCarousel = () => {
       el.style.opacity = opacity;
       el.style.filter = blur > 0 ? `blur(${blur}px)` : "none";
     });
-  }, [emblaApi]);
+  }, [emblaApi, isMobile]);
 
-  // rAF loop for smooth style updates during scroll
+  // rAF loop for smooth style updates during scroll (desktop only)
   useEffect(() => {
-    if (!emblaApi) return;
+    if (!emblaApi || isMobile) return;
 
     const onScroll = () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -184,6 +184,7 @@ const DesktopCarousel = () => {
 
     emblaApi.on("scroll", onScroll);
     emblaApi.on("reInit", onScroll);
+    // Initial paint
     updateSlideStyles();
 
     return () => {
@@ -191,12 +192,15 @@ const DesktopCarousel = () => {
       emblaApi.off("reInit", onScroll);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [emblaApi, updateSlideStyles]);
+  }, [emblaApi, isMobile, updateSlideStyles]);
 
   useEffect(() => {
     if (!emblaApi) return;
 
-    const onSelect = () => setActiveIndex(emblaApi.selectedScrollSnap());
+    const onSelect = () => {
+      setActiveIndex(emblaApi.selectedScrollSnap());
+    };
+
     const onPointerDown = () => setIsDragging(true);
     const onPointerUp = () => setIsDragging(false);
 
@@ -204,6 +208,7 @@ const DesktopCarousel = () => {
     emblaApi.on("reInit", onSelect);
     emblaApi.on("pointerDown", onPointerDown);
     emblaApi.on("pointerUp", onPointerUp);
+
     onSelect();
 
     return () => {
@@ -214,82 +219,46 @@ const DesktopCarousel = () => {
     };
   }, [emblaApi]);
 
-  // Horizontal wheel/trackpad scrolling
+  // Horizontal wheel/trackpad scrolling — gesture-driven, no time cooldown
   useEffect(() => {
     if (!emblaApi) return;
+
     const viewportNode = emblaApi.rootNode();
     if (!viewportNode) return;
 
     const onWheel = (event) => {
+      // Only act on horizontal gestures
       if (Math.abs(event.deltaX) < 1) return;
       event.preventDefault();
+
+      // Accumulate delta from the trackpad gesture
       wheelDeltaRef.current += event.deltaX;
+
+      // Reset accumulator when gesture stops (no new events for 80ms)
       clearTimeout(wheelTimeoutRef.current);
       wheelTimeoutRef.current = setTimeout(() => {
         wheelDeltaRef.current = 0;
       }, 80);
+
+      // Scroll when enough delta has accumulated
       const THRESHOLD = 50;
       if (Math.abs(wheelDeltaRef.current) >= THRESHOLD) {
-        if (wheelDeltaRef.current > 0) emblaApi.scrollNext();
-        else emblaApi.scrollPrev();
+        if (wheelDeltaRef.current > 0) {
+          emblaApi.scrollNext();
+        } else {
+          emblaApi.scrollPrev();
+        }
         wheelDeltaRef.current = 0;
       }
     };
 
     viewportNode.addEventListener("wheel", onWheel, { passive: false });
+
     return () => {
       viewportNode.removeEventListener("wheel", onWheel);
       clearTimeout(wheelTimeoutRef.current);
     };
   }, [emblaApi]);
-
-  return (
-    <div
-      ref={emblaRef}
-      className={cn(
-        "relative overflow-hidden select-none py-12 -my-6 carousel-viewport",
-        isDragging ? "cursor-grabbing carousel-dragging" : "cursor-grab"
-      )}
-      style={{ touchAction: "pan-y pinch-zoom" }}
-    >
-      <div className="carousel-container -ml-5 flex items-stretch">
-        {products.map((product, index) => (
-          <div
-            key={product.id}
-            className="carousel-slide pl-5 min-w-0 flex-[0_0_30%] xl:flex-[0_0_28%]"
-          >
-            <div
-              ref={(el) => (slideRefs.current[index] = el)}
-              className="carousel-slide-inner"
-            >
-              <ProductCard product={product} />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="sr-only" aria-live="polite">
-        {products[activeIndex]?.title}
-      </div>
-    </div>
-  );
-};
-
-// ============================================================
-// MAIN CAROUSEL — switches between mobile/desktop
-// ============================================================
-export default function Carousel() {
-  const [isMobile, setIsMobile] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    const mql = window.matchMedia("(max-width: 1023px)");
-    const check = () => setIsMobile(mql.matches);
-    check();
-    setMounted(true);
-    mql.addEventListener("change", check);
-    return () => mql.removeEventListener("change", check);
-  }, []);
 
   return (
     <section className="relative w-full overflow-hidden bg-surface dark:bg-[#0a0f0c] select-none pt-16 md:pt-24 pb-4 transition-colors duration-300">
@@ -306,7 +275,48 @@ export default function Carousel() {
 
       {/* Carousel Container */}
       <div className="w-full relative pb-4 md:pb-6 overflow-hidden mx-auto max-w-[1600px]">
-        {mounted && (isMobile ? <MobileCarousel /> : <DesktopCarousel />)}
+        <div
+          ref={emblaRef}
+          className={cn(
+            "relative overflow-hidden select-none py-12 -my-6 carousel-viewport",
+            isDragging ? "cursor-grabbing carousel-dragging" : "cursor-grab"
+          )}
+          style={{ touchAction: "pan-y pinch-zoom" }}
+        >
+          <div className="carousel-container -ml-3 md:-ml-5 flex items-stretch">
+            {products.map((product, index) => {
+              return (
+                <div
+                  key={product.id}
+                  className={cn(
+                    "carousel-slide pl-3 md:pl-5 min-w-0",
+                    // Mobile: single card takes ~85% width
+                    "flex-[0_0_85%]",
+                    // Tablet
+                    "sm:flex-[0_0_50%]",
+                    // Desktop: ~30% so 3 cards fit nicely in view
+                    "lg:flex-[0_0_30%]",
+                    "xl:flex-[0_0_28%]"
+                  )}
+                >
+                  <div
+                    ref={(el) => (slideRefs.current[index] = el)}
+                    className="carousel-slide-inner"
+                    style={isMobile ? undefined : undefined}
+                  >
+                    <ProductCard product={product} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="sr-only" aria-live="polite">
+            {products[activeIndex]?.title}
+          </div>
+        </div>
+
+
       </div>
 
     </section>
