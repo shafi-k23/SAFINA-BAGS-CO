@@ -17,12 +17,14 @@
 html {
     scroll-behavior: smooth;
     scroll-padding-top: 80px;
+    overscroll-behavior-x: none;
 }
 
 body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+    overscroll-behavior-x: none;
 }
 
 /* --- BACK TO TOP BUTTON --- */
@@ -170,15 +172,19 @@ html.dark .navbar-scrolled {
 /* Mobile: neighbor cards faded — NO blur to prevent jitter */
 @media (max-width: 1023px) {
     .carousel-slide-inner.mobile-neighbor {
-        opacity: 0.35;
+        opacity: 0.85;
         transform: scale(1);
     }
     .carousel-slide-inner.mobile-far {
-        opacity: 0.2;
+        opacity: 0.72;
         transform: scale(1);
     }
     .carousel-slide-inner.mobile-active {
         transform: scale(1) !important;
+    }
+    .carousel-viewport.carousel-dragging .carousel-slide-inner {
+        transition: none !important;
+        filter: none !important;
     }
 }
 

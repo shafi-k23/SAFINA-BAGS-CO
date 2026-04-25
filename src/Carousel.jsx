@@ -146,22 +146,21 @@ export default function Carousel() {
     if (!viewportNode) return;
 
     const onWheel = (event) => {
-      const dominantDelta = Math.abs(event.deltaX) > Math.abs(event.deltaY)
-        ? event.deltaX
-        : (event.shiftKey ? event.deltaY : 0);
+      const horizontalDelta = event.deltaX;
 
-      if (Math.abs(dominantDelta) < 8) return;
+      // Always intercept horizontal trackpad/wheel gestures inside the carousel
+      // so browser history navigation does not trigger on edge swipes.
+      if (Math.abs(horizontalDelta) < 4) return;
+      event.preventDefault();
 
       const now = performance.now();
       if (now - wheelCooldownRef.current < 120) {
-        event.preventDefault();
         return;
       }
 
       wheelCooldownRef.current = now;
-      event.preventDefault();
 
-      if (dominantDelta > 0) {
+      if (horizontalDelta > 0) {
         emblaApi.scrollNext();
       } else {
         emblaApi.scrollPrev();
@@ -203,7 +202,7 @@ export default function Carousel() {
           ref={emblaRef}
           className={cn(
             "relative overflow-hidden select-none py-12 -my-6 carousel-viewport",
-            isDragging ? "cursor-grabbing" : "cursor-grab"
+            isDragging ? "cursor-grabbing carousel-dragging" : "cursor-grab"
           )}
           style={{ touchAction: "pan-y pinch-zoom" }}
         >
