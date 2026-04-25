@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -97,6 +97,10 @@ const ProductCard = ({ product }) => {
   );
 };
 
+// Detect mobile/tablet once
+const isMobileQuery = () =>
+  typeof window !== "undefined" && window.matchMedia("(max-width: 1023px)").matches;
+
 export default function Carousel() {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
@@ -104,7 +108,7 @@ export default function Carousel() {
     dragFree: false,
     containScroll: false,
     skipSnaps: false,
-    duration: 20,
+    duration: 25,
     slidesToScroll: 1,
     watchDrag: true,
   });
@@ -113,6 +117,82 @@ export default function Carousel() {
   const wheelTimeoutRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const rafRef = useRef(null);
+  const slideRefs = useRef([]);
+
+  // Detect mobile on mount + resize
+  useEffect(() => {
+    const check = () => setIsMobile(isMobileQuery());
+    check();
+    window.addEventListener("resize", check, { passive: true });
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // Apply per-slide opacity via CSS custom properties driven by Embla's scroll progress
+  // This avoids React re-renders during drag — pure DOM updates in a rAF loop
+  const updateSlideStyles = useCallback(() => {
+    if (!emblaApi || isMobile) return;
+
+    const engine = emblaApi.internalEngine();
+    const scrollProgress = emblaApi.scrollProgress();
+    const slidesInView = emblaApi.slidesInView();
+
+    emblaApi.scrollSnapList().forEach((snapPoint, index) => {
+      const el = slideRefs.current[index];
+      if (!el) return;
+
+      // Calculate how far this slide is from the current scroll position
+      let diffToTarget = snapPoint - scrollProgress;
+
+      // Handle loop wrapping
+      const slidesCount = emblaApi.scrollSnapList().length;
+      if (engine.options.loop) {
+        // Normalize the diff to be in [-0.5, 0.5] range
+        while (diffToTarget > 0.5) diffToTarget -= 1;
+        while (diffToTarget < -0.5) diffToTarget += 1;
+      }
+
+      const distance = Math.abs(diffToTarget);
+      // Map distance to opacity: center = 1, one away ~0.6, far ~0.2
+      const normalizedDist = distance * slidesCount;
+      let opacity, blur;
+      if (normalizedDist < 0.5) {
+        opacity = 1;
+        blur = 0;
+      } else if (normalizedDist < 1.5) {
+        opacity = 0.6;
+        blur = 0;
+      } else {
+        opacity = 0.2;
+        blur = 1.5;
+      }
+
+      el.style.opacity = opacity;
+      el.style.filter = blur > 0 ? `blur(${blur}px)` : "none";
+    });
+  }, [emblaApi, isMobile]);
+
+  // rAF loop for smooth style updates during scroll (desktop only)
+  useEffect(() => {
+    if (!emblaApi || isMobile) return;
+
+    const onScroll = () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(updateSlideStyles);
+    };
+
+    emblaApi.on("scroll", onScroll);
+    emblaApi.on("reInit", onScroll);
+    // Initial paint
+    updateSlideStyles();
+
+    return () => {
+      emblaApi.off("scroll", onScroll);
+      emblaApi.off("reInit", onScroll);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [emblaApi, isMobile, updateSlideStyles]);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -136,51 +216,6 @@ export default function Carousel() {
       emblaApi.off("reInit", onSelect);
       emblaApi.off("pointerDown", onPointerDown);
       emblaApi.off("pointerUp", onPointerUp);
-    };
-  }, [emblaApi]);
-
-  // Prevent Firefox back/forward gesture on touch swipes
-  useEffect(() => {
-    if (!emblaApi) return;
-
-    const viewportNode = emblaApi.rootNode();
-    if (!viewportNode) return;
-
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let directionLocked = false;
-    let isHorizontal = false;
-
-    const onTouchStart = (e) => {
-      const touch = e.touches[0];
-      touchStartX = touch.clientX;
-      touchStartY = touch.clientY;
-      directionLocked = false;
-      isHorizontal = false;
-    };
-
-    const onTouchMove = (e) => {
-      if (!e.touches[0]) return;
-      const dx = Math.abs(e.touches[0].clientX - touchStartX);
-      const dy = Math.abs(e.touches[0].clientY - touchStartY);
-
-      if (!directionLocked && (dx > 5 || dy > 5)) {
-        directionLocked = true;
-        isHorizontal = dx > dy;
-      }
-
-      // If swiping horizontally, prevent the browser from navigating back/forward
-      if (directionLocked && isHorizontal) {
-        e.preventDefault();
-      }
-    };
-
-    viewportNode.addEventListener("touchstart", onTouchStart, { passive: true });
-    viewportNode.addEventListener("touchmove", onTouchMove, { passive: false });
-
-    return () => {
-      viewportNode.removeEventListener("touchstart", onTouchStart);
-      viewportNode.removeEventListener("touchmove", onTouchMove);
     };
   }, [emblaApi]);
 
@@ -225,15 +260,6 @@ export default function Carousel() {
     };
   }, [emblaApi]);
 
-  const getDistanceFromCenter = (index) => {
-    const total = products.length;
-    let distance = Math.abs(index - activeIndex);
-    if (distance > total / 2) {
-      distance = total - distance;
-    }
-    return distance;
-  };
-
   return (
     <section className="relative w-full overflow-hidden bg-surface dark:bg-[#0a0f0c] select-none pt-16 md:pt-24 pb-4 transition-colors duration-300">
       
@@ -257,15 +283,13 @@ export default function Carousel() {
           )}
           style={{ touchAction: "pan-y pinch-zoom" }}
         >
-          <div className="-ml-3 md:-ml-5 flex items-stretch">
+          <div className="carousel-container -ml-3 md:-ml-5 flex items-stretch">
             {products.map((product, index) => {
-              const distance = getDistanceFromCenter(index);
-              
               return (
                 <div
                   key={product.id}
                   className={cn(
-                    "pl-3 md:pl-5 min-w-0",
+                    "carousel-slide pl-3 md:pl-5 min-w-0",
                     // Mobile: single card takes ~85% width
                     "flex-[0_0_85%]",
                     // Tablet
@@ -276,13 +300,9 @@ export default function Carousel() {
                   )}
                 >
                   <div
-                    className={cn(
-                      "carousel-slide-inner",
-                      // On mobile: fade non-center cards
-                      distance === 0 && "mobile-active",
-                      distance === 1 && "mobile-neighbor",
-                      distance >= 2 && "mobile-far",
-                    )}
+                    ref={(el) => (slideRefs.current[index] = el)}
+                    className="carousel-slide-inner"
+                    style={isMobile ? undefined : undefined}
                   >
                     <ProductCard product={product} />
                   </div>

@@ -156,50 +156,81 @@ html.dark .navbar-scrolled {
     }
 }
 
-/* --- CAROUSEL SLIDE TRANSITIONS --- */
-.carousel-slide-inner {
-    transition: opacity 0.35s ease-out, filter 0.35s ease-out;
-    will-change: opacity;
+/* --- CAROUSEL: GPU-ACCELERATED SMOOTH SCROLLING --- */
+
+/* Force every slide onto its own GPU layer for zero-jitter scrolling */
+.carousel-slide {
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+}
+
+.carousel-slide-inner {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+}
+
+.carousel-container {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
 }
 
 .carousel-viewport {
     overscroll-behavior-x: none;
     overscroll-behavior: none;
     -ms-scroll-chaining: none;
+    -webkit-overflow-scrolling: touch;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
 }
 
-/* Mobile: no transitions, no effects — clean and jitter-free */
+/* Prevent long-press callout and text selection during drag */
+.carousel-viewport.carousel-dragging {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* MOBILE: completely static slides — zero transitions, zero re-paints during swipe */
 @media (max-width: 1023px) {
     .carousel-slide-inner {
+        opacity: 1 !important;
+        filter: none !important;
         transition: none !important;
         will-change: auto;
-        filter: none !important;
     }
-    .carousel-slide-inner.mobile-neighbor,
-    .carousel-slide-inner.mobile-far,
-    .carousel-slide-inner.mobile-active {
-        opacity: 1 !important;
-    }
+
     .carousel-viewport.carousel-dragging .carousel-slide-inner {
         transition: none !important;
         filter: none !important;
     }
+
+    /* Prevent image dragging/ghosting on touch */
+    .carousel-slide-inner img {
+        -webkit-user-drag: none;
+        user-drag: none;
+        -webkit-touch-callout: none;
+        pointer-events: none;
+    }
 }
 
-/* Desktop (lg+): opacity-only depth effect — no scale, no shake */
+/* DESKTOP (lg+): smooth opacity depth driven by JS — transitions for settle */
 @media (min-width: 1024px) {
-    .carousel-slide-inner.mobile-active {
-        opacity: 1 !important;
-        filter: none !important;
+    .carousel-slide-inner {
+        transition: opacity 0.3s ease-out, filter 0.3s ease-out;
     }
-    .carousel-slide-inner.mobile-neighbor {
-        opacity: 0.6;
-    }
-    .carousel-slide-inner.mobile-far {
-        opacity: 0.2;
-        filter: blur(1.5px);
+
+    /* During active drag, disable transitions for instant response */
+    .carousel-viewport.carousel-dragging .carousel-slide-inner {
+        transition: none !important;
     }
 }
 
