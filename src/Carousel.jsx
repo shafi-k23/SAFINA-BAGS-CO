@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -107,22 +106,12 @@ export default function Carousel() {
     skipSnaps: false,
     duration: 18,
     slidesToScroll: 1,
+    watchDrag: true,
   });
 
   const wheelCooldownRef = useRef(0);
   const [isDragging, setIsDragging] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [scrollSnaps, setScrollSnaps] = useState([]);
-
-  const handlePrevious = useCallback(() => {
-    if (!emblaApi) return;
-    emblaApi.scrollPrev();
-  }, [emblaApi]);
-
-  const handleNext = useCallback(() => {
-    if (!emblaApi) return;
-    emblaApi.scrollNext();
-  }, [emblaApi]);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -138,8 +127,7 @@ export default function Carousel() {
     emblaApi.on("reInit", onSelect);
     emblaApi.on("pointerDown", onPointerDown);
     emblaApi.on("pointerUp", onPointerUp);
-    
-    setScrollSnaps(emblaApi.scrollSnapList());
+
     onSelect();
 
     return () => {
@@ -187,41 +175,6 @@ export default function Carousel() {
     };
   }, [emblaApi]);
 
-  // Calculate distance from active index for opacity/scale effects
-  const getSlideStyle = (index) => {
-    const total = products.length;
-    // Calculate shortest circular distance
-    let distance = Math.abs(index - activeIndex);
-    if (distance > total / 2) {
-      distance = total - distance;
-    }
-
-    // Desktop: center 3 cards fully visible, neighbors faded
-    // Mobile: only center card fully visible
-    if (distance === 0) {
-      return {
-        opacity: 1,
-        transform: "scale(1)",
-        filter: "none",
-        transition: "opacity 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), filter 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)",
-      };
-    } else if (distance === 1) {
-      return {
-        opacity: "",  // Will be set via CSS classes for responsive
-        transform: "",
-        filter: "",
-        transition: "opacity 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), filter 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)",
-      };
-    } else {
-      return {
-        opacity: 0.3,
-        transform: "scale(0.9)",
-        filter: "blur(1px)",
-        transition: "opacity 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), filter 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)",
-      };
-    }
-  };
-
   const getDistanceFromCenter = (index) => {
     const total = products.length;
     let distance = Math.abs(index - activeIndex);
@@ -246,30 +199,16 @@ export default function Carousel() {
 
       {/* Carousel Container */}
       <div className="w-full relative pb-4 md:pb-6 overflow-hidden mx-auto max-w-[1600px]">
-        {/* Desktop Controls */}
-        <div className="absolute top-1/2 -translate-y-1/2 left-2 right-2 md:left-6 md:right-6 hidden lg:flex justify-between pointer-events-none z-10">
-          <button onClick={handlePrevious} className="w-12 h-12 rounded-full bg-white/80 dark:bg-black/50 backdrop-blur border border-outline-variant/30 hover:scale-110 transition-transform pointer-events-auto flex items-center justify-center text-[#1a2a22] dark:text-white shadow-lg">
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <button onClick={handleNext} className="w-12 h-12 rounded-full bg-white/80 dark:bg-black/50 backdrop-blur border border-outline-variant/30 hover:scale-110 transition-transform pointer-events-auto flex items-center justify-center text-[#1a2a22] dark:text-white shadow-lg">
-            <ChevronRight className="w-6 h-6" />
-          </button>
-        </div>
-
         <div
           ref={emblaRef}
           className={cn(
             "relative overflow-hidden select-none py-12 -my-6",
             isDragging ? "cursor-grabbing" : "cursor-grab"
           )}
-          style={{
-            touchAction: "pan-y"
-          }}
         >
           <div className="-ml-3 md:-ml-5 flex items-stretch">
             {products.map((product, index) => {
               const distance = getDistanceFromCenter(index);
-              const slideStyle = getSlideStyle(index);
               
               return (
                 <div
@@ -293,23 +232,6 @@ export default function Carousel() {
                       distance === 1 && "mobile-neighbor",
                       distance >= 2 && "mobile-far",
                     )}
-                    style={{
-                      // Desktop styles applied via inline for distance >= 2
-                      // Distance 0 and 1 handled via CSS for responsiveness
-                      ...(distance === 0 ? {
-                        opacity: 1,
-                        transform: "scale(1)",
-                        filter: "none",
-                        transition: "opacity 0.4s ease, transform 0.4s ease, filter 0.4s ease",
-                      } : distance === 1 ? {
-                        transition: "opacity 0.4s ease, transform 0.4s ease, filter 0.4s ease",
-                      } : {
-                        opacity: 0.3,
-                        transform: "scale(0.9)",
-                        filter: "blur(1px)",
-                        transition: "opacity 0.4s ease, transform 0.4s ease, filter 0.4s ease",
-                      })
-                    }}
                   >
                     <ProductCard product={product} />
                   </div>
@@ -323,42 +245,7 @@ export default function Carousel() {
           </div>
         </div>
 
-        {/* Dot Indicators */}
-        <div className="mt-6 flex items-center justify-center gap-2">
-          {products.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => emblaApi && emblaApi.scrollTo(index)}
-              className={cn(
-                "rounded-full transition-all duration-300",
-                index === activeIndex
-                  ? "w-8 h-2.5 bg-[#1a2a22] dark:bg-[#c5d5bf]"
-                  : "w-2.5 h-2.5 bg-[#a6b0a3]/50 dark:bg-[#8a9589]/30 hover:bg-[#a6b0a3] dark:hover:bg-[#8a9589]/50"
-              )}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
 
-        {/* Mobile Controls */}
-        <div className="mt-3 flex items-center justify-center gap-2 lg:hidden">
-          <button
-            type="button"
-            onClick={handlePrevious}
-            className="h-10 w-10 rounded-full border border-outline-variant/40 bg-white/80 dark:bg-black/50 text-[#1a2a22] dark:text-white backdrop-blur"
-            aria-label="Previous product"
-          >
-            <ChevronLeft className="mx-auto h-5 w-5" />
-          </button>
-          <button
-            type="button"
-            onClick={handleNext}
-            className="h-10 w-10 rounded-full border border-outline-variant/40 bg-white/80 dark:bg-black/50 text-[#1a2a22] dark:text-white backdrop-blur"
-            aria-label="Next product"
-          >
-            <ChevronRight className="mx-auto h-5 w-5" />
-          </button>
-        </div>
       </div>
 
     </section>
