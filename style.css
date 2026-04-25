@@ -171,15 +171,21 @@ html.dark .navbar-scrolled {
 
 /* Mobile: neighbor cards faded — NO blur to prevent jitter */
 @media (max-width: 1023px) {
+    .carousel-slide-inner {
+        transition: none !important;
+        will-change: auto;
+        filter: none !important;
+    }
     .carousel-slide-inner.mobile-neighbor {
-        opacity: 0.85;
+        opacity: 1;
         transform: scale(1);
     }
     .carousel-slide-inner.mobile-far {
-        opacity: 0.72;
+        opacity: 1;
         transform: scale(1);
     }
     .carousel-slide-inner.mobile-active {
+        opacity: 1 !important;
         transform: scale(1) !important;
     }
     .carousel-viewport.carousel-dragging .carousel-slide-inner {
