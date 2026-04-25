@@ -158,11 +158,14 @@ html.dark .navbar-scrolled {
 
 /* --- CAROUSEL SLIDE TRANSITIONS --- */
 .carousel-slide-inner {
-    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                filter 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     will-change: opacity, transform;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     transform: scale(1);
+    transform-origin: center center;
 }
 
 .carousel-viewport {
@@ -171,7 +174,7 @@ html.dark .navbar-scrolled {
     -ms-scroll-chaining: none;
 }
 
-/* Mobile: neighbor cards faded — NO blur to prevent jitter */
+/* Mobile: no transitions, no effects — clean and jitter-free */
 @media (max-width: 1023px) {
     .carousel-slide-inner {
         transition: none !important;
@@ -196,24 +199,25 @@ html.dark .navbar-scrolled {
     }
 }
 
-/* Desktop (lg+): distance-1 cards fully visible for 3-card center layout */
-@media (min-width: 1024px) {
-    .carousel-slide-inner.mobile-neighbor {
-        opacity: 0.72;
-        transform: scale(0.94);
-    }
-    .carousel-slide-inner.mobile-far {
-        opacity: 0.28;
-        transform: scale(0.88);
-        filter: blur(1.2px);
-    }
-}
-
-/* Desktop only: active card gets slight scale-up */
+/* Desktop (lg+): smooth depth effect with buttery transitions */
 @media (min-width: 1024px) {
     .carousel-slide-inner.mobile-active {
         opacity: 1 !important;
-        transform: scale(1.03) !important;
+        transform: scale(1.02) !important;
         filter: none !important;
+    }
+    .carousel-slide-inner.mobile-neighbor {
+        opacity: 0.7;
+        transform: scale(0.96);
+    }
+    .carousel-slide-inner.mobile-far {
+        opacity: 0.25;
+        transform: scale(0.90);
+        filter: blur(1.5px);
+    }
+
+    /* While dragging on desktop, speed up transitions to follow the cursor */
+    .carousel-viewport.carousel-dragging .carousel-slide-inner {
+        transition-duration: 0.2s;
     }
 }

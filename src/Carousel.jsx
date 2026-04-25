@@ -104,7 +104,7 @@ export default function Carousel() {
     dragFree: false,
     containScroll: false,
     skipSnaps: false,
-    duration: 12,
+    duration: 28,
     slidesToScroll: 1,
     watchDrag: true,
   });
@@ -199,7 +199,7 @@ export default function Carousel() {
       event.preventDefault();
 
       const now = performance.now();
-      if (now - wheelCooldownRef.current < 120) {
+      if (now - wheelCooldownRef.current < 400) {
         return;
       }
 
