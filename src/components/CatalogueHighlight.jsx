@@ -1,8 +1,19 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
 export default function CatalogueHighlight() {
   const cataloguePath = '/Catlouge.pdf';
+  const [activeButton, setActiveButton] = useState(null);
+
+  useEffect(() => {
+    if (!activeButton) return undefined;
+
+    const timer = setTimeout(() => {
+      setActiveButton(null);
+    }, 420);
+
+    return () => clearTimeout(timer);
+  }, [activeButton]);
 
   return (
     <section
@@ -42,12 +53,26 @@ export default function CatalogueHighlight() {
               <motion.a
                 href={cataloguePath}
                 download
-                whileHover={{ y: -2, scale: 1.01 }}
-                whileTap={{ scale: 0.98 }}
+                onClick={() => setActiveButton('download')}
+                whileHover={{ y: -3, scale: 1.02, rotate: -0.4 }}
+                whileTap={{ scale: 0.965 }}
                 className="group relative inline-flex min-h-[56px] md:min-h-[60px] items-center justify-center gap-2.5 rounded-2xl bg-[#1a2a22] dark:bg-[#dbe7d8] px-6 md:px-8 text-sm md:text-base font-bold text-white dark:text-[#132019] transition-all duration-300 shadow-[0_12px_28px_-16px_rgba(26,42,34,0.9)] dark:shadow-[0_12px_28px_-16px_rgba(219,231,216,0.85)] overflow-hidden"
               >
+                <motion.span
+                  aria-hidden
+                  initial={false}
+                  animate={activeButton === 'download' ? { scale: [0.2, 1.6], opacity: [0.42, 0] } : { scale: 0.2, opacity: 0 }}
+                  transition={{ duration: 0.42, ease: 'easeOut' }}
+                  className="pointer-events-none absolute inset-0 m-auto h-16 w-16 rounded-full bg-white/35"
+                />
                 <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full" />
-                <span className="material-symbols-outlined !text-[20px]">download</span>
+                <motion.span
+                  className="material-symbols-outlined !text-[20px]"
+                  animate={activeButton === 'download' ? { y: [0, 2, -1, 0], rotate: [0, 5, -4, 0] } : { y: 0, rotate: 0 }}
+                  transition={{ duration: 0.34, ease: 'easeInOut' }}
+                >
+                  download
+                </motion.span>
                 Download Catalogue
               </motion.a>
 
@@ -55,11 +80,18 @@ export default function CatalogueHighlight() {
                 href={cataloguePath}
                 target="_blank"
                 rel="noreferrer"
-                whileHover={{ y: -2 }}
-                whileTap={{ scale: 0.99 }}
+                onClick={() => setActiveButton('preview')}
+                whileHover={{ y: -3, scale: 1.015 }}
+                whileTap={{ scale: 0.975 }}
                 className="inline-flex min-h-[48px] md:min-h-[52px] items-center justify-center gap-2 rounded-2xl border border-[#1a2a22]/25 dark:border-[#dbe7d8]/30 bg-white/70 dark:bg-[#0f1712]/70 px-5 md:px-6 text-sm md:text-[15px] font-semibold text-[#1d2b22] dark:text-[#dbe7d8] backdrop-blur-sm transition-colors duration-300 hover:bg-white dark:hover:bg-[#162119]"
               >
-                <span className="material-symbols-outlined !text-[19px]">open_in_new</span>
+                <motion.span
+                  className="material-symbols-outlined !text-[19px]"
+                  animate={activeButton === 'preview' ? { x: [0, 3, 0], y: [0, -2, 0] } : { x: 0, y: 0 }}
+                  transition={{ duration: 0.32, ease: 'easeInOut' }}
+                >
+                  open_in_new
+                </motion.span>
                 Preview First
               </motion.a>
             </div>
