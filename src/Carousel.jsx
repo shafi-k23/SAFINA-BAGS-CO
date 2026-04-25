@@ -103,10 +103,52 @@ const ProductCard = ({ product }) => {
 
 export default function Carousel() {
   const containerRef = useRef(null);
+  const prevSingleSetWidthRef = useRef(0);
+  const touchStateRef = useRef({
+    startX: 0,
+    startY: 0,
+    lastX: 0,
+    lastTime: 0,
+    velocityX: 0,
+    isHorizontal: false
+  });
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeftPos, setScrollLeftPos] = useState(0);
   const rafRef = useRef(null);
+
+  const getStepWidth = (track) => {
+    if (!track || track.children.length < 2) {
+      return window.innerWidth < 1024 ? window.innerWidth * 0.82 : (window.innerWidth >= 1280 ? 340 : 320);
+    }
+
+    const first = track.children[0];
+    const second = track.children[1];
+    return Math.max(1, second.offsetLeft - first.offsetLeft);
+  };
+
+  const snapToNearestCard = (velocityX = 0) => {
+    const track = containerRef.current;
+    if (!track) return;
+
+    const singleSetWidth = track.scrollWidth / LOOP_SET_COUNT;
+    if (!singleSetWidth) return;
+
+    const stepWidth = getStepWidth(track);
+    const maxIndex = Math.max(0, products.length - 1);
+    const logicalOffset = ((track.scrollLeft % singleSetWidth) + singleSetWidth) % singleSetWidth;
+    const currentIndex = logicalOffset / stepWidth;
+
+    let targetIndex = Math.round(currentIndex);
+    if (Math.abs(velocityX) > 0.35) {
+      targetIndex += velocityX < 0 ? 1 : -1;
+    }
+
+    targetIndex = Math.max(0, Math.min(maxIndex, targetIndex));
+
+    track.style.scrollBehavior = "smooth";
+    track.scrollLeft = singleSetWidth + (targetIndex * stepWidth);
+  };
 
   const recenterToMiddleSet = () => {
     const track = containerRef.current;
@@ -115,8 +157,8 @@ export default function Carousel() {
     const singleSetWidth = track.scrollWidth / LOOP_SET_COUNT;
     if (!singleSetWidth) return;
 
-    const minAllowed = singleSetWidth * 0.5;
-    const maxAllowed = singleSetWidth * 1.5;
+    const minAllowed = singleSetWidth * 0.1;
+    const maxAllowed = singleSetWidth * 1.9;
 
     if (track.scrollLeft < minAllowed || track.scrollLeft > maxAllowed) {
       const prevBehavior = track.style.scrollBehavior;
@@ -147,18 +189,33 @@ export default function Carousel() {
 
     const centerTrack = () => {
       const singleSetWidth = track.scrollWidth / LOOP_SET_COUNT;
+      if (!singleSetWidth) return;
       track.style.scrollBehavior = "auto";
       track.scrollLeft = singleSetWidth;
+      prevSingleSetWidthRef.current = singleSetWidth;
+    };
+
+    const preserveTrackPositionOnResize = () => {
+      const nextSingleSetWidth = track.scrollWidth / LOOP_SET_COUNT;
+      if (!nextSingleSetWidth) return;
+
+      const prevSingleSetWidth = prevSingleSetWidthRef.current || nextSingleSetWidth;
+      const logicalOffset = ((track.scrollLeft % prevSingleSetWidth) + prevSingleSetWidth) % prevSingleSetWidth;
+      const offsetRatio = prevSingleSetWidth ? logicalOffset / prevSingleSetWidth : 0;
+
+      track.style.scrollBehavior = "auto";
+      track.scrollLeft = nextSingleSetWidth + (offsetRatio * nextSingleSetWidth);
+      prevSingleSetWidthRef.current = nextSingleSetWidth;
     };
 
     centerTrack();
-    window.addEventListener("resize", centerTrack);
+    window.addEventListener("resize", preserveTrackPositionOnResize);
 
     return () => {
       if (rafRef.current) {
         cancelAnimationFrame(rafRef.current);
       }
-      window.removeEventListener("resize", centerTrack);
+      window.removeEventListener("resize", preserveTrackPositionOnResize);
     };
   }, []);
 
@@ -178,6 +235,51 @@ export default function Carousel() {
   };
   
   const handleMouseUp = () => {
+    snapToNearestCard(0);
+    setIsDragging(false);
+  };
+
+  const handleTouchStart = (e) => {
+    const touch = e.touches[0];
+    const now = performance.now();
+
+    touchStateRef.current = {
+      startX: touch.clientX,
+      startY: touch.clientY,
+      lastX: touch.clientX,
+      lastTime: now,
+      velocityX: 0,
+      isHorizontal: false
+    };
+  };
+
+  const handleTouchMove = (e) => {
+    const touch = e.touches[0];
+    const now = performance.now();
+    const state = touchStateRef.current;
+    const dxFromStart = touch.clientX - state.startX;
+    const dyFromStart = touch.clientY - state.startY;
+
+    if (!state.isHorizontal && Math.abs(dxFromStart) > 10 && Math.abs(dxFromStart) > Math.abs(dyFromStart)) {
+      state.isHorizontal = true;
+      setIsDragging(true);
+    }
+
+    const dt = Math.max(1, now - state.lastTime);
+    state.velocityX = (touch.clientX - state.lastX) / dt;
+    state.lastX = touch.clientX;
+    state.lastTime = now;
+
+    if (state.isHorizontal) {
+      e.preventDefault();
+    }
+  };
+
+  const handleTouchEnd = () => {
+    const { velocityX, isHorizontal } = touchStateRef.current;
+    if (isHorizontal) {
+      snapToNearestCard(velocityX);
+    }
     setIsDragging(false);
   };
 
@@ -228,12 +330,21 @@ export default function Carousel() {
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onTouchCancel={handleTouchEnd}
           onScroll={handleScroll}
           className={cn(
-            "flex flex-row items-stretch overflow-x-auto overflow-y-hidden px-[calc(50vw-41vw)] sm:px-[calc(50vw-130px)] lg:px-[calc(50vw-140px)] xl:px-[calc(50vw-150px)] py-12 -my-6 transition-all touch-pan-x",
+            "flex flex-row items-stretch overflow-x-auto overflow-y-hidden px-[calc(50vw-41vw)] sm:px-[calc(50vw-130px)] lg:px-[calc(50vw-140px)] xl:px-[calc(50vw-150px)] py-12 -my-6 transition-all",
             isDragging ? "cursor-grabbing snap-none" : "cursor-grab snap-x snap-mandatory"
           )}
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            touchAction: 'auto',
+            WebkitOverflowScrolling: 'touch'
+          }}
         >
           {infiniteProducts.map((product, idx) => (
             <div 
