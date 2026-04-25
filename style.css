@@ -175,3 +175,43 @@ html.dark .navbar-scrolled {
         scroll-behavior: auto;
     }
 }
+
+/* --- CAROUSEL SLIDE TRANSITIONS --- */
+.carousel-slide-inner {
+    transition: opacity 0.4s ease, transform 0.4s ease, filter 0.4s ease;
+    will-change: opacity, transform, filter;
+}
+
+/* Mobile: neighbor cards faded */
+@media (max-width: 1023px) {
+    .carousel-slide-inner.mobile-neighbor {
+        opacity: 0.4;
+        transform: scale(0.92);
+        filter: blur(0.5px);
+    }
+    .carousel-slide-inner.mobile-far {
+        opacity: 0.25;
+        transform: scale(0.88);
+        filter: blur(1px);
+    }
+}
+
+/* Desktop (lg+): distance-1 cards fully visible for 3-card center layout */
+@media (min-width: 1024px) {
+    .carousel-slide-inner.mobile-neighbor {
+        opacity: 0.85;
+        transform: scale(0.97);
+        filter: none;
+    }
+    .carousel-slide-inner.mobile-far {
+        opacity: 0.35;
+        transform: scale(0.92);
+        filter: blur(1px);
+    }
+}
+
+.carousel-slide-inner.mobile-active {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+    filter: none !important;
+}

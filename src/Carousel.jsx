@@ -1,5 +1,6 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import useEmblaCarousel from "embla-carousel-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -52,15 +53,11 @@ const products = [
   }
 ];
 
-// Use three sets and keep the user in the middle set for a seamless infinite loop.
-const LOOP_SET_COUNT = 3;
-const infiniteProducts = Array(LOOP_SET_COUNT).fill(products).flat();
-
 // --- PRODUCT CARD (NO MOUSE 3D ROTATION) ---
 const ProductCard = ({ product }) => {
   return (
     <div
-      className="relative flex flex-col flex-shrink-0 h-full w-[82vw] sm:w-[260px] lg:w-[280px] xl:w-[300px] mx-3 md:mx-5 rounded-[24px] bg-surface-container-lowest dark:bg-[#111916] border border-outline-variant/30 dark:border-white/10 shadow-sm transition-all duration-500"
+      className="relative flex flex-col h-full w-full rounded-[24px] bg-surface-container-lowest dark:bg-[#111916] border border-outline-variant/30 dark:border-white/10 shadow-sm transition-all duration-500"
     >
       <div className="flex flex-col h-full rounded-[24px] overflow-hidden pointer-events-none">
         
@@ -102,211 +99,136 @@ const ProductCard = ({ product }) => {
 };
 
 export default function Carousel() {
-  const containerRef = useRef(null);
-  const prevSingleSetWidthRef = useRef(0);
-  const isProgrammaticSnapRef = useRef(false);
-  const snapTimeoutRef = useRef(null);
-  const touchStateRef = useRef({
-    startX: 0,
-    startY: 0,
-    lastX: 0,
-    lastTime: 0,
-    velocityX: 0,
-    isHorizontal: false
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: "center",
+    dragFree: false,
+    containScroll: false,
+    skipSnaps: false,
+    duration: 18,
+    slidesToScroll: 1,
   });
+
+  const wheelCooldownRef = useRef(0);
   const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeftPos, setScrollLeftPos] = useState(0);
-  const rafRef = useRef(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [scrollSnaps, setScrollSnaps] = useState([]);
 
-  const getStepWidth = (track) => {
-    if (!track || track.children.length < 2) {
-      return window.innerWidth < 1024 ? window.innerWidth * 0.82 : (window.innerWidth >= 1280 ? 340 : 320);
-    }
+  const handlePrevious = useCallback(() => {
+    if (!emblaApi) return;
+    emblaApi.scrollPrev();
+  }, [emblaApi]);
 
-    const first = track.children[0];
-    const second = track.children[1];
-    return Math.max(1, second.offsetLeft - first.offsetLeft);
-  };
-
-  const snapToNearestCard = (velocityX = 0) => {
-    const track = containerRef.current;
-    if (!track) return;
-
-    const stepWidth = getStepWidth(track);
-    const currentIndex = track.scrollLeft / stepWidth;
-
-    let targetIndex = Math.round(currentIndex);
-    if (Math.abs(velocityX) > 0.35) {
-      targetIndex += velocityX < 0 ? 1 : -1;
-    }
-
-    isProgrammaticSnapRef.current = true;
-    track.style.scrollBehavior = "smooth";
-    track.scrollLeft = targetIndex * stepWidth;
-
-    if (snapTimeoutRef.current) {
-      clearTimeout(snapTimeoutRef.current);
-    }
-
-    snapTimeoutRef.current = setTimeout(() => {
-      isProgrammaticSnapRef.current = false;
-      recenterToMiddleSet();
-    }, 380);
-  };
-
-  const recenterToMiddleSet = () => {
-    const track = containerRef.current;
-    if (!track) return;
-
-    const singleSetWidth = track.scrollWidth / LOOP_SET_COUNT;
-    if (!singleSetWidth) return;
-
-    const minAllowed = singleSetWidth * 0.1;
-    const maxAllowed = singleSetWidth * 1.9;
-
-    if (track.scrollLeft < minAllowed || track.scrollLeft > maxAllowed) {
-      const prevBehavior = track.style.scrollBehavior;
-      track.style.scrollBehavior = "auto";
-      if (track.scrollLeft < minAllowed) {
-        track.scrollLeft += singleSetWidth;
-      } else {
-        track.scrollLeft -= singleSetWidth;
-      }
-      track.style.scrollBehavior = prevBehavior;
-    }
-  };
-
-  const handleScroll = () => {
-    if (isProgrammaticSnapRef.current) return;
-
-    if (rafRef.current) {
-      cancelAnimationFrame(rafRef.current);
-    }
-
-    rafRef.current = requestAnimationFrame(() => {
-      recenterToMiddleSet();
-      rafRef.current = null;
-    });
-  };
+  const handleNext = useCallback(() => {
+    if (!emblaApi) return;
+    emblaApi.scrollNext();
+  }, [emblaApi]);
 
   useEffect(() => {
-    const track = containerRef.current;
-    if (!track) return;
+    if (!emblaApi) return;
 
-    const centerTrack = () => {
-      const singleSetWidth = track.scrollWidth / LOOP_SET_COUNT;
-      if (!singleSetWidth) return;
-      track.style.scrollBehavior = "auto";
-      track.scrollLeft = singleSetWidth;
-      prevSingleSetWidthRef.current = singleSetWidth;
+    const onSelect = () => {
+      setActiveIndex(emblaApi.selectedScrollSnap());
     };
 
-    const preserveTrackPositionOnResize = () => {
-      const nextSingleSetWidth = track.scrollWidth / LOOP_SET_COUNT;
-      if (!nextSingleSetWidth) return;
+    const onPointerDown = () => setIsDragging(true);
+    const onPointerUp = () => setIsDragging(false);
 
-      const prevSingleSetWidth = prevSingleSetWidthRef.current || nextSingleSetWidth;
-      const logicalOffset = ((track.scrollLeft % prevSingleSetWidth) + prevSingleSetWidth) % prevSingleSetWidth;
-      const offsetRatio = prevSingleSetWidth ? logicalOffset / prevSingleSetWidth : 0;
-
-      track.style.scrollBehavior = "auto";
-      track.scrollLeft = nextSingleSetWidth + (offsetRatio * nextSingleSetWidth);
-      prevSingleSetWidthRef.current = nextSingleSetWidth;
-    };
-
-    centerTrack();
-    window.addEventListener("resize", preserveTrackPositionOnResize);
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", onSelect);
+    emblaApi.on("pointerDown", onPointerDown);
+    emblaApi.on("pointerUp", onPointerUp);
+    
+    setScrollSnaps(emblaApi.scrollSnapList());
+    onSelect();
 
     return () => {
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-      }
-      if (snapTimeoutRef.current) {
-        clearTimeout(snapTimeoutRef.current);
-      }
-      window.removeEventListener("resize", preserveTrackPositionOnResize);
+      emblaApi.off("select", onSelect);
+      emblaApi.off("reInit", onSelect);
+      emblaApi.off("pointerDown", onPointerDown);
+      emblaApi.off("pointerUp", onPointerUp);
     };
-  }, []);
+  }, [emblaApi]);
 
-  const handleMouseDown = (e) => {
-    setIsDragging(true);
-    setStartX(e.pageX - containerRef.current.offsetLeft);
-    setScrollLeftPos(containerRef.current.scrollLeft);
-    containerRef.current.style.scrollBehavior = 'auto'; // Remove smooth scroll when dragging
-  };
-  
-  const handleMouseMove = (e) => {
-    if (!isDragging) return;
-    e.preventDefault();
-    const x = e.pageX - containerRef.current.offsetLeft;
-    const walk = (x - startX) * 1.5; 
-    containerRef.current.scrollLeft = scrollLeftPos - walk;
-  };
-  
-  const handleMouseUp = () => {
-    snapToNearestCard(0);
-    setIsDragging(false);
-  };
+  // Horizontal wheel scrolling
+  useEffect(() => {
+    if (!emblaApi) return;
 
-  const handleTouchStart = (e) => {
-    const touch = e.touches[0];
-    const now = performance.now();
+    const viewportNode = emblaApi.rootNode();
+    if (!viewportNode) return;
 
-    touchStateRef.current = {
-      startX: touch.clientX,
-      startY: touch.clientY,
-      lastX: touch.clientX,
-      lastTime: now,
-      velocityX: 0,
-      isHorizontal: false
+    const onWheel = (event) => {
+      const dominantDelta = Math.abs(event.deltaX) > Math.abs(event.deltaY)
+        ? event.deltaX
+        : (event.shiftKey ? event.deltaY : 0);
+
+      if (Math.abs(dominantDelta) < 8) return;
+
+      const now = performance.now();
+      if (now - wheelCooldownRef.current < 180) {
+        event.preventDefault();
+        return;
+      }
+
+      wheelCooldownRef.current = now;
+      event.preventDefault();
+
+      if (dominantDelta > 0) {
+        emblaApi.scrollNext();
+      } else {
+        emblaApi.scrollPrev();
+      }
     };
+
+    viewportNode.addEventListener("wheel", onWheel, { passive: false });
+
+    return () => {
+      viewportNode.removeEventListener("wheel", onWheel);
+    };
+  }, [emblaApi]);
+
+  // Calculate distance from active index for opacity/scale effects
+  const getSlideStyle = (index) => {
+    const total = products.length;
+    // Calculate shortest circular distance
+    let distance = Math.abs(index - activeIndex);
+    if (distance > total / 2) {
+      distance = total - distance;
+    }
+
+    // Desktop: center 3 cards fully visible, neighbors faded
+    // Mobile: only center card fully visible
+    if (distance === 0) {
+      return {
+        opacity: 1,
+        transform: "scale(1)",
+        filter: "none",
+        transition: "opacity 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), filter 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)",
+      };
+    } else if (distance === 1) {
+      return {
+        opacity: "",  // Will be set via CSS classes for responsive
+        transform: "",
+        filter: "",
+        transition: "opacity 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), filter 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)",
+      };
+    } else {
+      return {
+        opacity: 0.3,
+        transform: "scale(0.9)",
+        filter: "blur(1px)",
+        transition: "opacity 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), filter 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)",
+      };
+    }
   };
 
-  const handleTouchMove = (e) => {
-    const touch = e.touches[0];
-    const now = performance.now();
-    const state = touchStateRef.current;
-    const dxFromStart = touch.clientX - state.startX;
-    const dyFromStart = touch.clientY - state.startY;
-
-    if (!state.isHorizontal && Math.abs(dxFromStart) > 10 && Math.abs(dxFromStart) > Math.abs(dyFromStart)) {
-      state.isHorizontal = true;
-      setIsDragging(true);
+  const getDistanceFromCenter = (index) => {
+    const total = products.length;
+    let distance = Math.abs(index - activeIndex);
+    if (distance > total / 2) {
+      distance = total - distance;
     }
-
-    const dt = Math.max(1, now - state.lastTime);
-    state.velocityX = (touch.clientX - state.lastX) / dt;
-    state.lastX = touch.clientX;
-    state.lastTime = now;
-
-    if (state.isHorizontal) {
-      e.preventDefault();
-    }
-  };
-
-  const handleTouchEnd = () => {
-    const { velocityX, isHorizontal } = touchStateRef.current;
-    if (isHorizontal) {
-      snapToNearestCard(velocityX);
-    }
-    setIsDragging(false);
-  };
-
-  const scrollLeft = () => {
-    if (containerRef.current) {
-      containerRef.current.style.scrollBehavior = 'smooth';
-      const cardWidth = window.innerWidth < 1024 ? window.innerWidth * 0.82 : (window.innerWidth >= 1280 ? 340 : 320);
-      containerRef.current.scrollBy({ left: -cardWidth, behavior: 'smooth' });
-    }
-  };
-
-  const scrollRight = () => {
-    if (containerRef.current) {
-      containerRef.current.style.scrollBehavior = 'smooth';
-      const cardWidth = window.innerWidth < 1024 ? window.innerWidth * 0.82 : (window.innerWidth >= 1280 ? 340 : 320);
-      containerRef.current.scrollBy({ left: cardWidth, behavior: 'smooth' });
-    }
+    return distance;
   };
 
   return (
@@ -322,48 +244,120 @@ export default function Carousel() {
         </div>
       </div>
 
-      {/* Swipeable Tracking Grid */}
+      {/* Carousel Container */}
       <div className="w-full relative pb-4 md:pb-6 overflow-hidden mx-auto max-w-[1600px]">
         {/* Desktop Controls */}
         <div className="absolute top-1/2 -translate-y-1/2 left-2 right-2 md:left-6 md:right-6 hidden lg:flex justify-between pointer-events-none z-10">
-          <button onClick={scrollLeft} className="w-12 h-12 rounded-full bg-white/80 dark:bg-black/50 backdrop-blur border border-outline-variant/30 hover:scale-110 transition-transform pointer-events-auto flex items-center justify-center text-[#1a2a22] dark:text-white shadow-lg">
+          <button onClick={handlePrevious} className="w-12 h-12 rounded-full bg-white/80 dark:bg-black/50 backdrop-blur border border-outline-variant/30 hover:scale-110 transition-transform pointer-events-auto flex items-center justify-center text-[#1a2a22] dark:text-white shadow-lg">
             <ChevronLeft className="w-6 h-6" />
           </button>
-          <button onClick={scrollRight} className="w-12 h-12 rounded-full bg-white/80 dark:bg-black/50 backdrop-blur border border-outline-variant/30 hover:scale-110 transition-transform pointer-events-auto flex items-center justify-center text-[#1a2a22] dark:text-white shadow-lg">
+          <button onClick={handleNext} className="w-12 h-12 rounded-full bg-white/80 dark:bg-black/50 backdrop-blur border border-outline-variant/30 hover:scale-110 transition-transform pointer-events-auto flex items-center justify-center text-[#1a2a22] dark:text-white shadow-lg">
             <ChevronRight className="w-6 h-6" />
           </button>
         </div>
 
         <div
-          ref={containerRef}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          onTouchCancel={handleTouchEnd}
-          onScroll={handleScroll}
+          ref={emblaRef}
           className={cn(
-            "flex flex-row items-stretch overflow-x-auto overflow-y-hidden px-[calc(50vw-41vw)] sm:px-[calc(50vw-130px)] lg:px-[calc(50vw-140px)] xl:px-[calc(50vw-150px)] py-12 -my-6 transition-all",
-            isDragging ? "cursor-grabbing snap-none" : "cursor-grab snap-x snap-mandatory"
+            "relative overflow-hidden select-none py-12 -my-6",
+            isDragging ? "cursor-grabbing" : "cursor-grab"
           )}
           style={{
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            touchAction: 'auto',
-            WebkitOverflowScrolling: 'touch'
+            touchAction: "pan-y"
           }}
         >
-          {infiniteProducts.map((product, idx) => (
-            <div 
-              key={`${product.id}-${idx}`} 
-              className="snap-center pointer-events-auto flex-shrink-0 flex items-stretch h-auto"
-            >
-                <ProductCard product={product} />
-            </div>
+          <div className="-ml-3 md:-ml-5 flex items-stretch">
+            {products.map((product, index) => {
+              const distance = getDistanceFromCenter(index);
+              const slideStyle = getSlideStyle(index);
+              
+              return (
+                <div
+                  key={product.id}
+                  className={cn(
+                    "pl-3 md:pl-5 min-w-0",
+                    // Mobile: single card takes ~85% width
+                    "flex-[0_0_85%]",
+                    // Tablet
+                    "sm:flex-[0_0_50%]",
+                    // Desktop: ~30% so 3 cards fit nicely in view
+                    "lg:flex-[0_0_30%]",
+                    "xl:flex-[0_0_28%]"
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "carousel-slide-inner",
+                      // On mobile: fade non-center cards
+                      distance === 0 && "mobile-active",
+                      distance === 1 && "mobile-neighbor",
+                      distance >= 2 && "mobile-far",
+                    )}
+                    style={{
+                      // Desktop styles applied via inline for distance >= 2
+                      // Distance 0 and 1 handled via CSS for responsiveness
+                      ...(distance === 0 ? {
+                        opacity: 1,
+                        transform: "scale(1)",
+                        filter: "none",
+                        transition: "opacity 0.4s ease, transform 0.4s ease, filter 0.4s ease",
+                      } : distance === 1 ? {
+                        transition: "opacity 0.4s ease, transform 0.4s ease, filter 0.4s ease",
+                      } : {
+                        opacity: 0.3,
+                        transform: "scale(0.9)",
+                        filter: "blur(1px)",
+                        transition: "opacity 0.4s ease, transform 0.4s ease, filter 0.4s ease",
+                      })
+                    }}
+                  >
+                    <ProductCard product={product} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="sr-only" aria-live="polite">
+            {products[activeIndex]?.title}
+          </div>
+        </div>
+
+        {/* Dot Indicators */}
+        <div className="mt-6 flex items-center justify-center gap-2">
+          {products.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => emblaApi && emblaApi.scrollTo(index)}
+              className={cn(
+                "rounded-full transition-all duration-300",
+                index === activeIndex
+                  ? "w-8 h-2.5 bg-[#1a2a22] dark:bg-[#c5d5bf]"
+                  : "w-2.5 h-2.5 bg-[#a6b0a3]/50 dark:bg-[#8a9589]/30 hover:bg-[#a6b0a3] dark:hover:bg-[#8a9589]/50"
+              )}
+              aria-label={`Go to slide ${index + 1}`}
+            />
           ))}
+        </div>
+
+        {/* Mobile Controls */}
+        <div className="mt-3 flex items-center justify-center gap-2 lg:hidden">
+          <button
+            type="button"
+            onClick={handlePrevious}
+            className="h-10 w-10 rounded-full border border-outline-variant/40 bg-white/80 dark:bg-black/50 text-[#1a2a22] dark:text-white backdrop-blur"
+            aria-label="Previous product"
+          >
+            <ChevronLeft className="mx-auto h-5 w-5" />
+          </button>
+          <button
+            type="button"
+            onClick={handleNext}
+            className="h-10 w-10 rounded-full border border-outline-variant/40 bg-white/80 dark:bg-black/50 text-[#1a2a22] dark:text-white backdrop-blur"
+            aria-label="Next product"
+          >
+            <ChevronRight className="mx-auto h-5 w-5" />
+          </button>
         </div>
       </div>
 
