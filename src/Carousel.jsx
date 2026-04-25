@@ -104,12 +104,13 @@ export default function Carousel() {
     dragFree: false,
     containScroll: false,
     skipSnaps: false,
-    duration: 22,
+    duration: 12,
     slidesToScroll: 1,
     watchDrag: true,
   });
 
-  const wheelCooldownRef = useRef(0);
+  const wheelDeltaRef = useRef(0);
+  const wheelTimeoutRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -183,7 +184,7 @@ export default function Carousel() {
     };
   }, [emblaApi]);
 
-  // Horizontal wheel scrolling (trackpad/mouse)
+  // Horizontal wheel/trackpad scrolling — gesture-driven, no time cooldown
   useEffect(() => {
     if (!emblaApi) return;
 
@@ -191,24 +192,28 @@ export default function Carousel() {
     if (!viewportNode) return;
 
     const onWheel = (event) => {
-      const horizontalDelta = event.deltaX;
-
-      // Always intercept horizontal trackpad/wheel gestures inside the carousel
-      // so browser history navigation does not trigger on edge swipes.
-      if (Math.abs(horizontalDelta) < 2) return;
+      // Only act on horizontal gestures
+      if (Math.abs(event.deltaX) < 1) return;
       event.preventDefault();
 
-      const now = performance.now();
-      if (now - wheelCooldownRef.current < 200) {
-        return;
-      }
+      // Accumulate delta from the trackpad gesture
+      wheelDeltaRef.current += event.deltaX;
 
-      wheelCooldownRef.current = now;
+      // Reset accumulator when gesture stops (no new events for 80ms)
+      clearTimeout(wheelTimeoutRef.current);
+      wheelTimeoutRef.current = setTimeout(() => {
+        wheelDeltaRef.current = 0;
+      }, 80);
 
-      if (horizontalDelta > 0) {
-        emblaApi.scrollNext();
-      } else {
-        emblaApi.scrollPrev();
+      // Scroll when enough delta has accumulated
+      const THRESHOLD = 50;
+      if (Math.abs(wheelDeltaRef.current) >= THRESHOLD) {
+        if (wheelDeltaRef.current > 0) {
+          emblaApi.scrollNext();
+        } else {
+          emblaApi.scrollPrev();
+        }
+        wheelDeltaRef.current = 0;
       }
     };
 
@@ -216,6 +221,7 @@ export default function Carousel() {
 
     return () => {
       viewportNode.removeEventListener("wheel", onWheel);
+      clearTimeout(wheelTimeoutRef.current);
     };
   }, [emblaApi]);
 
