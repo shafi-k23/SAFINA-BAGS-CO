@@ -138,7 +138,52 @@ export default function Carousel() {
     };
   }, [emblaApi]);
 
-  // Horizontal wheel scrolling
+  // Prevent Firefox back/forward gesture on touch swipes
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    const viewportNode = emblaApi.rootNode();
+    if (!viewportNode) return;
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let directionLocked = false;
+    let isHorizontal = false;
+
+    const onTouchStart = (e) => {
+      const touch = e.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+      directionLocked = false;
+      isHorizontal = false;
+    };
+
+    const onTouchMove = (e) => {
+      if (!e.touches[0]) return;
+      const dx = Math.abs(e.touches[0].clientX - touchStartX);
+      const dy = Math.abs(e.touches[0].clientY - touchStartY);
+
+      if (!directionLocked && (dx > 5 || dy > 5)) {
+        directionLocked = true;
+        isHorizontal = dx > dy;
+      }
+
+      // If swiping horizontally, prevent the browser from navigating back/forward
+      if (directionLocked && isHorizontal) {
+        e.preventDefault();
+      }
+    };
+
+    viewportNode.addEventListener("touchstart", onTouchStart, { passive: true });
+    viewportNode.addEventListener("touchmove", onTouchMove, { passive: false });
+
+    return () => {
+      viewportNode.removeEventListener("touchstart", onTouchStart);
+      viewportNode.removeEventListener("touchmove", onTouchMove);
+    };
+  }, [emblaApi]);
+
+  // Horizontal wheel scrolling (trackpad/mouse)
   useEffect(() => {
     if (!emblaApi) return;
 
@@ -150,7 +195,7 @@ export default function Carousel() {
 
       // Always intercept horizontal trackpad/wheel gestures inside the carousel
       // so browser history navigation does not trigger on edge swipes.
-      if (Math.abs(horizontalDelta) < 4) return;
+      if (Math.abs(horizontalDelta) < 2) return;
       event.preventDefault();
 
       const now = performance.now();

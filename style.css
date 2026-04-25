@@ -166,7 +166,9 @@ html.dark .navbar-scrolled {
 }
 
 .carousel-viewport {
-    overscroll-behavior-x: contain;
+    overscroll-behavior-x: none;
+    overscroll-behavior: none;
+    -ms-scroll-chaining: none;
 }
 
 /* Mobile: neighbor cards faded — NO blur to prevent jitter */
@@ -207,8 +209,11 @@ html.dark .navbar-scrolled {
     }
 }
 
-.carousel-slide-inner.mobile-active {
-    opacity: 1 !important;
-    transform: scale(1.03) !important;
-    filter: none !important;
+/* Desktop only: active card gets slight scale-up */
+@media (min-width: 1024px) {
+    .carousel-slide-inner.mobile-active {
+        opacity: 1 !important;
+        transform: scale(1.03) !important;
+        filter: none !important;
+    }
 }
