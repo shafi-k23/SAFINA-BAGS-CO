@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 export default function ExtraSections() {
   const factoryColumns = [
     [
-      { type: 'video', src: '', icon: 'precision_manufacturing', label: 'Cutting Machine Video Pending', orientation: 'vertical' },
+      { type: 'video', src: 'images/CuttinMachine.mp4', icon: 'precision_manufacturing', label: 'Cutting Machine', orientation: 'vertical' },
       { type: 'video', src: 'images/stitching-video1-horizontal.mp4', icon: 'videocam', label: 'Stitching Video 1', orientation: 'horizontal' }
     ],
     [
