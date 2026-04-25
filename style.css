@@ -160,18 +160,25 @@ html.dark .navbar-scrolled {
     will-change: opacity, transform;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: scale(1);
+}
+
+.carousel-viewport {
+    overscroll-behavior-x: contain;
 }
 
 /* Mobile: neighbor cards faded — NO blur to prevent jitter */
 @media (max-width: 1023px) {
     .carousel-slide-inner.mobile-neighbor {
         opacity: 0.35;
-        transform: translate3d(0, 0, 0) scale(0.93);
+        transform: scale(1);
     }
     .carousel-slide-inner.mobile-far {
         opacity: 0.2;
-        transform: translate3d(0, 0, 0) scale(0.88);
+        transform: scale(1);
+    }
+    .carousel-slide-inner.mobile-active {
+        transform: scale(1) !important;
     }
 }
 
@@ -179,17 +186,17 @@ html.dark .navbar-scrolled {
 @media (min-width: 1024px) {
     .carousel-slide-inner.mobile-neighbor {
         opacity: 0.72;
-        transform: translate3d(0, 0, 0) scale(0.94);
+        transform: scale(0.94);
     }
     .carousel-slide-inner.mobile-far {
         opacity: 0.28;
-        transform: translate3d(0, 0, 0) scale(0.88);
+        transform: scale(0.88);
         filter: blur(1.2px);
     }
 }
 
 .carousel-slide-inner.mobile-active {
     opacity: 1 !important;
-    transform: translate3d(0, 0, 0) scale(1.03) !important;
+    transform: scale(1.03) !important;
     filter: none !important;
 }

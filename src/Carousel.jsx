@@ -104,7 +104,7 @@ export default function Carousel() {
     dragFree: false,
     containScroll: false,
     skipSnaps: false,
-    duration: 18,
+    duration: 12,
     slidesToScroll: 1,
     watchDrag: true,
   });
@@ -153,7 +153,7 @@ export default function Carousel() {
       if (Math.abs(dominantDelta) < 8) return;
 
       const now = performance.now();
-      if (now - wheelCooldownRef.current < 180) {
+      if (now - wheelCooldownRef.current < 120) {
         event.preventDefault();
         return;
       }
@@ -202,9 +202,10 @@ export default function Carousel() {
         <div
           ref={emblaRef}
           className={cn(
-            "relative overflow-hidden select-none py-12 -my-6",
+            "relative overflow-hidden select-none py-12 -my-6 carousel-viewport",
             isDragging ? "cursor-grabbing" : "cursor-grab"
           )}
+          style={{ touchAction: "pan-y pinch-zoom" }}
         >
           <div className="-ml-3 md:-ml-5 flex items-stretch">
             {products.map((product, index) => {
