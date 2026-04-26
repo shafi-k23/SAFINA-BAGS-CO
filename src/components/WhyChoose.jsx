@@ -53,7 +53,7 @@ export default function WhyChoose() {
   ];
 
   return (
-    <section className="max-w-screen-2xl mx-auto pt-4 md:pt-6 pb-12 md:pb-16 px-6 md:px-12 bg-surface-container-lowest dark:bg-[#0a0f0c]" id="why-choose">
+    <section className="max-w-screen-2xl mx-auto pt-4 md:pt-6 pb-6 md:pb-16 px-6 md:px-12 bg-surface-container-lowest dark:bg-[#0a0f0c]" id="why-choose">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}

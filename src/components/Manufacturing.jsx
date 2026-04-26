@@ -43,7 +43,7 @@ export default function Manufacturing() {
   ];
 
   return (
-    <section className="max-w-screen-2xl mx-auto py-12 md:py-16 px-6 md:px-12 bg-surface dark:bg-[#080e0b]" id="manufacturing">
+    <section className="max-w-screen-2xl mx-auto pt-6 md:pt-16 pb-12 md:pb-16 px-6 md:px-12 bg-surface dark:bg-[#080e0b]" id="manufacturing">
       <div className="grid items-center grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
         
         <motion.div 

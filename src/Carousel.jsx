@@ -203,7 +203,7 @@ export default function Carousel() {
   }, [emblaApi]);
 
   return (
-    <section className="relative w-full overflow-hidden bg-surface dark:bg-[#0a0f0c] select-none pt-16 md:pt-24 pb-4 transition-colors duration-300">
+    <section className="relative w-full overflow-hidden bg-surface dark:bg-[#0a0f0c] select-none pt-8 md:pt-24 pb-4 transition-colors duration-300">
       
       <div className="max-w-[1600px] mx-auto px-6 md:px-12 mb-10 flex flex-col md:flex-row items-start md:items-end justify-between gap-6 reveal-up">
         <div className="max-w-2xl reveal-up">

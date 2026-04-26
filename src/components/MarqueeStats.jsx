@@ -36,7 +36,7 @@ export default function MarqueeStats() {
         </div>
       </div>
       
-      <div className="bg-surface-container-low dark:bg-[#111916] py-12 px-6 md:px-12 border-b border-surface-variant dark:border-[#8a9589]/10">
+      <div className="bg-surface-container-low dark:bg-[#111916] py-8 md:py-12 px-6 md:px-12 border-b border-surface-variant dark:border-[#8a9589]/10">
         <motion.div 
           variants={containerVariants}
           initial="hidden"
