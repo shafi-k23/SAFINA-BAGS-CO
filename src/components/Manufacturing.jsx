@@ -54,7 +54,7 @@ export default function Manufacturing() {
           className="w-full aspect-square md:aspect-auto h-full min-h-[500px] overflow-hidden bg-[#131b16] rounded-2xl flex items-center justify-center"
         >
           <img 
-            src="images/image-2.jpg" 
+            src="images/image-2.webp" 
             alt="Backpack Manufacturing Process and Quality Control" 
             className="object-cover w-full h-full hover:scale-105 transition-transform duration-[10s]" 
             loading="lazy" 

@@ -1,18 +1,100 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
 export default function ExtraSections() {
+  const HoverVideo = ({ src, className }) => {
+    const videoRef = useRef(null);
+    const containerRef = useRef(null);
+    const [isInView, setIsInView] = useState(false);
+    const [isDesktop, setIsDesktop] = useState(true);
+
+    useEffect(() => {
+      const checkIsDesktop = () => setIsDesktop(window.innerWidth >= 768);
+      checkIsDesktop();
+      window.addEventListener('resize', checkIsDesktop);
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setIsInView(true);
+            if (videoRef.current && window.innerWidth < 768) {
+              videoRef.current.play().catch(() => {});
+            }
+          } else {
+            if (videoRef.current) {
+              videoRef.current.pause();
+            }
+          }
+        },
+        { rootMargin: "100px" }
+      );
+
+      if (containerRef.current) {
+        observer.observe(containerRef.current);
+      }
+
+      return () => {
+        window.removeEventListener('resize', checkIsDesktop);
+        observer.disconnect();
+      };
+    }, []);
+
+    const handleMouseEnter = () => {
+      if (isDesktop && videoRef.current && isInView) {
+        videoRef.current.play().catch(() => {});
+      }
+    };
+
+    const handleMouseLeave = () => {
+      if (isDesktop && videoRef.current) {
+        videoRef.current.pause();
+      }
+    };
+
+    return (
+      <div 
+        ref={containerRef} 
+        className="absolute inset-0 w-full h-full"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        {isInView ? (
+          <>
+            <video 
+              ref={videoRef}
+              src={src} 
+              className={className}
+              loop 
+              muted 
+              playsInline 
+              preload="metadata"
+            />
+            {isDesktop && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-500 opacity-100 group-hover:opacity-0 bg-black/10">
+                <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-2xl transition-transform duration-500 group-hover:scale-75">
+                  <span className="material-symbols-outlined text-white text-2xl md:text-3xl drop-shadow-md font-light translate-x-0.5">play_arrow</span>
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="w-full h-full bg-[#1c2620]/20" />
+        )}
+      </div>
+    );
+  };
+
   const factoryColumns = [
     [
       { type: 'video', src: 'images/CuttinMachine.mp4', icon: 'precision_manufacturing', label: 'Cutting Machine', orientation: 'vertical' },
       { type: 'video', src: 'images/stitching-video1-horizontal.mp4', icon: 'videocam', label: 'Stitching Video 1', orientation: 'horizontal' }
     ],
     [
-      { type: 'image', src: 'images/factory-layout-horizontal.png', icon: 'factory', label: 'Factory Layout Photo', orientation: 'horizontal' },
-      { type: 'image', src: 'images/factory-layout-vertical.png', icon: 'factory', label: 'Factory Machinery Photo', orientation: 'vertical' }
+      { type: 'image', src: 'images/factory-layout-horizontal.webp', icon: 'factory', label: 'Factory Layout Photo', orientation: 'horizontal' },
+      { type: 'image', src: 'images/factory-layout-vertical.webp', icon: 'factory', label: 'Factory Machinery Photo', orientation: 'vertical' }
     ],
     [
-      { type: 'image', src: 'images/quality%20check%20vertical.png', icon: 'verified', label: 'Quality Checking Photo', orientation: 'vertical' },
+      { type: 'image', src: 'images/quality%20check%20vertical.webp', icon: 'verified', label: 'Quality Checking Photo', orientation: 'vertical' },
       { type: 'video', src: 'images/stitching%20video2-horizontal.mp4', icon: 'videocam', label: 'Stitching Video 2', orientation: 'horizontal' }
     ]
   ];
@@ -64,14 +146,9 @@ export default function ExtraSections() {
                 >
                   {item.src ? (
                     item.type === 'video' ? (
-                      <video 
+                      <HoverVideo 
                         src={item.src} 
                         className="absolute inset-0 w-full h-full object-cover" 
-                        autoPlay 
-                        loop 
-                        muted 
-                        playsInline 
-                        preload="metadata"
                       />
                     ) : (
                       <img 

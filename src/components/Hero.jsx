@@ -96,7 +96,7 @@ export default function Hero() {
           {/* Actual image container with overflow-hidden */}
           <div className="w-full h-full overflow-hidden bg-surface-container dark:bg-[#131b16] rounded-2xl shadow-xl md:shadow-none shadow-[#1a2a22]/10 will-change-transform">
             <img
-              src="images/image-1.jpg"
+              src="images/image-1.webp"
               alt="Premium Backpack Manufacturing at Safina Bags"
               className="object-cover w-full h-full hover:scale-105 transition-transform duration-1000"
               width="800"

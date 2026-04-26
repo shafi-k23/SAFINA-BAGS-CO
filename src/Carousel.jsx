@@ -13,42 +13,42 @@ const products = [
     title: "Corporate Laptop Bags",
     subtitle: "TECH-READY • MINIMALIST",
     desc: "For tech companies, startups, and onboarding kits. Structured compartments and secure organization.",
-    image: "images/image-3.jpg",
+    image: "images/image-3.webp",
   },
   {
     id: 2,
     title: "Travel & Field Gear",
     subtitle: "RUGGED",
     desc: "For logistics teams, field workers, and travel brands. High-capacity builds with weather-resistant materials.",
-    image: "images/image-4.jpg",
+    image: "images/image-4.webp",
   },
   {
     id: 3,
     title: "Executive & Gifting",
     subtitle: "PREMIUM • GIFTING",
     desc: "Premium branded bags for corporate gifting and VIP clients with subtle, elegant customization.",
-    image: "images/image-5.jpg",
+    image: "images/image-5.webp",
   },
   {
     id: 4,
     title: "Daily Casual Backpacks",
     subtitle: "EVERYDAY • LIGHTWEIGHT",
     desc: "Perfect for daily commuters and casual use. Lightweight, durable, and stylish designs.",
-    image: "images/image-6.jpg",
+    image: "images/image-6.webp",
   },
   {
     id: 5,
     title: "School & College Bags",
     subtitle: "INSTITUTIONAL • ERGONOMIC",
     desc: "Institutional bulk orders for education. Built for daily wear and tear with ergonomic support.",
-    image: "images/image-7.jpg",
+    image: "images/image-7.webp",
   },
   {
     id: 6,
     title: "Laptop Backpacks",
     subtitle: "TECH • SECURE",
     desc: "Dedicated padded compartments for electronics. Ideal for students, tech workers, and professionals.",
-    image: "images/image-8.jpg",
+    image: "images/image-8.webp",
   }
 ];
 

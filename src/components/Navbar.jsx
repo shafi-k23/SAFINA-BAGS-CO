@@ -57,7 +57,7 @@ export default function Navbar() {
             className="flex items-center gap-1.5 sm:gap-3 hover:opacity-80 transition-opacity"
           >
             <img
-              src="/images/logo.png"
+              src="/images/logo.webp"
               alt="Safina Bags Co. Logo"
               className="h-6 sm:h-8 md:h-10 w-auto dark:invert transition-all"
               width="120"
