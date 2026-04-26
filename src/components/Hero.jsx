@@ -37,14 +37,14 @@ export default function Hero() {
           variants={itemVariants}
           className="mb-3 md:mb-6 text-[10px] md:text-sm tracking-[0.2em] md:tracking-[0.3em] uppercase font-body text-on-surface-variant dark:text-[#8a9589] font-bold"
         >
-          BENGALURU'S TRUSTED MANUFACTURER · SINCE 1995
+          BENGALURU'S TRUSTED BACKPACK MANUFACTURER · SINCE 1995
         </motion.p>
         
         <motion.h1
           variants={itemVariants}
-          className="max-w-2xl mb-5 md:mb-10 text-[2.75rem] leading-[1.05] md:text-7xl md:leading-tight tracking-tighter lg:text-8xl font-headline text-on-surface dark:text-[#f0f5ee]"
+          className="max-w-2xl mb-5 md:mb-10 text-4xl sm:text-[2.75rem] leading-[1.1] md:text-7xl md:leading-tight tracking-tighter lg:text-8xl font-headline text-on-surface dark:text-[#f0f5ee]"
         >
-          Bulk Backpacks.<br />
+          Premium Backpack Manufacturers.<br />
           <span className="italic text-primary font-headline">Built to Your Brand.</span>
         </motion.h1>
         
@@ -101,7 +101,7 @@ export default function Hero() {
         >
           <img
             src="images/image-1.jpg"
-            alt="Lifestyle / Factory Photo of Safina Bags"
+            alt="Premium Backpack Manufacturing at Safina Bags"
             className="object-cover w-full h-full hover:scale-105 transition-transform duration-1000"
             width="800"
             height="1000"

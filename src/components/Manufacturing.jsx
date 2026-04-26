@@ -55,7 +55,7 @@ export default function Manufacturing() {
         >
           <img 
             src="images/image-2.jpg" 
-            alt="Safina Factory Floor in Bengaluru" 
+            alt="Backpack Manufacturing Process and Quality Control" 
             className="object-cover w-full h-full hover:scale-105 transition-transform duration-[10s]" 
             loading="lazy" 
           />
@@ -68,7 +68,7 @@ export default function Manufacturing() {
            viewport={{ once: true, margin: "-100px" }}
         >
           <motion.h2 variants={itemVariants} className="mb-6 text-4xl md:text-5xl font-headline text-[#1a2a22] dark:text-white leading-tight">
-            How We Manufacture
+            Our Backpack Manufacturing Process
           </motion.h2>
           <motion.p variants={itemVariants} className="text-sm md:text-base font-body text-[#454e47] dark:text-[#8a9589] mb-8 leading-relaxed">
             Founded by Mohammed Raji Alam, Safina operates under 30+ years of quality-first execution. Our scalable network ensures controlled timelines.
