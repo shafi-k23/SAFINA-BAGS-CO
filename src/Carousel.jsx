@@ -111,18 +111,40 @@ export default function Carousel() {
 
   const wheelDeltaRef = useRef(0);
   const wheelTimeoutRef = useRef(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const viewportRef = useRef(null);
+  const srTextRef = useRef(null);
+
+  const setRefs = React.useCallback(
+    (node) => {
+      viewportRef.current = node;
+      emblaRef(node);
+    },
+    [emblaRef]
+  );
 
   useEffect(() => {
     if (!emblaApi) return;
 
     const onSelect = () => {
-      setActiveIndex(emblaApi.selectedScrollSnap());
+      const idx = emblaApi.selectedScrollSnap();
+      if (srTextRef.current && products[idx]) {
+        srTextRef.current.textContent = products[idx].title;
+      }
     };
 
-    const onPointerDown = () => setIsDragging(true);
-    const onPointerUp = () => setIsDragging(false);
+    const onPointerDown = () => {
+      if (viewportRef.current) {
+        viewportRef.current.classList.add('cursor-grabbing', 'carousel-dragging');
+        viewportRef.current.classList.remove('cursor-grab');
+      }
+    };
+    
+    const onPointerUp = () => {
+      if (viewportRef.current) {
+        viewportRef.current.classList.remove('cursor-grabbing', 'carousel-dragging');
+        viewportRef.current.classList.add('cursor-grab');
+      }
+    };
 
     emblaApi.on("select", onSelect);
     emblaApi.on("reInit", onSelect);
@@ -196,11 +218,8 @@ export default function Carousel() {
       {/* Carousel Container */}
       <div className="w-full relative pb-4 md:pb-6 overflow-hidden mx-auto max-w-[1600px]">
         <div
-          ref={emblaRef}
-          className={cn(
-            "relative overflow-hidden select-none py-12 -my-6 carousel-viewport",
-            isDragging ? "cursor-grabbing carousel-dragging" : "cursor-grab"
-          )}
+          ref={setRefs}
+          className="relative overflow-hidden select-none py-12 -my-6 carousel-viewport cursor-grab"
           style={{ touchAction: "pan-y pinch-zoom" }}
         >
           <div className="carousel-container -ml-3 md:-ml-5 flex items-stretch">
@@ -227,8 +246,8 @@ export default function Carousel() {
             })}
           </div>
 
-          <div className="sr-only" aria-live="polite">
-            {products[activeIndex]?.title}
+          <div ref={srTextRef} className="sr-only" aria-live="polite">
+            {products[0]?.title}
           </div>
         </div>
 
