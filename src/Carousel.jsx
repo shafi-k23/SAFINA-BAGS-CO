@@ -107,6 +107,11 @@ export default function Carousel() {
     duration: 30,
     slidesToScroll: 1,
     watchDrag: true,
+    breakpoints: {
+      '(max-width: 1023px)': {
+        dragFree: true,
+      }
+    }
   });
 
   const wheelDeltaRef = useRef(0);
