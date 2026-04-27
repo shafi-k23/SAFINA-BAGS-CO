@@ -104,16 +104,9 @@ export default function Carousel() {
     dragFree: false,
     containScroll: false,
     skipSnaps: false,
-    duration: 30, // Maintains perfect speed for Desktop
+    duration: 30,
     slidesToScroll: 1,
     watchDrag: true,
-    breakpoints: {
-      '(max-width: 768px)': { 
-        dragFree: false,
-        skipSnaps: false, // strictly snap 1 at a time
-        duration: 20      // slightly faster snap on mobile for better feel
-      }
-    }
   });
 
   const wheelDeltaRef = useRef(0);
@@ -227,16 +220,17 @@ export default function Carousel() {
         <div
           ref={setRefs}
           className="relative overflow-hidden select-none py-12 -my-6 carousel-viewport cursor-grab"
+          style={{ touchAction: "pan-y pinch-zoom" }}
         >
-          <div className="carousel-container -ml-0 md:-ml-5 flex items-stretch">
+          <div className="carousel-container -ml-3 md:-ml-5 flex items-stretch">
             {products.map((product, index) => {
               return (
                 <div
                   key={product.id}
                   className={cn(
-                    "carousel-slide pl-4 pr-4 md:pr-0 md:pl-5 min-w-0",
-                    // Mobile: single card takes full width so NO cards peek on the sides
-                    "flex-[0_0_100%]",
+                    "carousel-slide pl-3 md:pl-5 min-w-0",
+                    // Mobile: single card takes ~85% width
+                    "flex-[0_0_85%]",
                     // Tablet
                     "sm:flex-[0_0_50%]",
                     // Desktop: ~30% so 3 cards fit nicely in view
