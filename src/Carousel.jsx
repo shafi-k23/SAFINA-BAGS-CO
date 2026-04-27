@@ -69,7 +69,7 @@ const ProductCard = ({ product }) => {
               draggable="false"
               loading="lazy"
               decoding="async"
-              className="object-cover object-center w-full h-full pointer-events-none mix-blend-darken dark:mix-blend-normal"
+              className="object-cover object-center w-full h-full pointer-events-none mix-blend-normal md:mix-blend-darken dark:mix-blend-normal"
             />
             : (
               <div className="absolute inset-0 flex items-center justify-center">
@@ -111,6 +111,10 @@ export default function Carousel() {
       duration: 22,
       slidesToScroll: 1,
       watchDrag: true,
+      // Mobile browsers trigger frequent viewport resizes (URL bar show/hide), which can
+      // cause subtle snap jitter if Embla re-inits during/after swipes.
+      watchResize: false,
+      watchSlides: false,
       breakpoints: {
         // Preserve existing desktop/tablet behavior exactly as before.
         "(min-width: 768px)": {
@@ -119,6 +123,8 @@ export default function Carousel() {
           containScroll: false,
           skipSnaps: false,
           duration: 30,
+          watchResize: true,
+          watchSlides: true,
         },
       },
     }),
