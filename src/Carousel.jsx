@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -67,6 +67,8 @@ const ProductCard = ({ product }) => {
               src={product.image}
               alt={product.title}
               draggable="false"
+              loading="lazy"
+              decoding="async"
               className="object-cover object-center w-full h-full pointer-events-none mix-blend-darken dark:mix-blend-normal"
             />
             : (
@@ -98,16 +100,32 @@ const ProductCard = ({ product }) => {
 };
 
 export default function Carousel() {
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: true,
-    align: "center",
-    dragFree: false,
-    containScroll: false,
-    skipSnaps: false,
-    duration: 30,
-    slidesToScroll: 1,
-    watchDrag: true,
-  });
+  const emblaOptions = useMemo(
+    () => ({
+      // Mobile defaults: keep infinite loop with one centered card.
+      loop: true,
+      align: "center",
+      dragFree: false,
+      containScroll: false,
+      skipSnaps: false,
+      duration: 22,
+      slidesToScroll: 1,
+      watchDrag: true,
+      breakpoints: {
+        // Preserve existing desktop/tablet behavior exactly as before.
+        "(min-width: 768px)": {
+          loop: true,
+          align: "center",
+          containScroll: false,
+          skipSnaps: false,
+          duration: 30,
+        },
+      },
+    }),
+    []
+  );
+
+  const [emblaRef, emblaApi] = useEmblaCarousel(emblaOptions);
 
   const wheelDeltaRef = useRef(0);
   const wheelTimeoutRef = useRef(null);
@@ -165,6 +183,8 @@ export default function Carousel() {
   useEffect(() => {
     if (!emblaApi) return;
 
+    if (window.matchMedia("(max-width: 767px)").matches) return;
+
     const viewportNode = emblaApi.rootNode();
     if (!viewportNode) return;
 
@@ -220,17 +240,17 @@ export default function Carousel() {
         <div
           ref={setRefs}
           className="relative overflow-hidden select-none py-12 -my-6 carousel-viewport cursor-grab"
-          style={{ touchAction: "pan-y pinch-zoom" }}
+          style={{ touchAction: "pan-y" }}
         >
-          <div className="carousel-container -ml-3 md:-ml-5 flex items-stretch">
-            {products.map((product, index) => {
+          <div className="carousel-container -ml-3 md:-ml-5 flex items-stretch will-change-transform [transform:translate3d(0,0,0)]">
+            {products.map((product) => {
               return (
                 <div
                   key={product.id}
                   className={cn(
-                    "carousel-slide pl-3 md:pl-5 min-w-0",
-                    // Mobile: single card takes ~85% width
-                    "flex-[0_0_85%]",
+                    "carousel-slide pl-3 md:pl-5 min-w-0 [backface-visibility:hidden]",
+                    // Mobile: keep a single centered card with side peeks.
+                    "flex-[0_0_88%]",
                     // Tablet
                     "sm:flex-[0_0_50%]",
                     // Desktop: ~30% so 3 cards fit nicely in view
