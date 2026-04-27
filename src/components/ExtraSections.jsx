@@ -5,10 +5,17 @@ export default function ExtraSections() {
   const HoverVideo = ({ src, className }) => {
     const videoRef = useRef(null);
     const containerRef = useRef(null);
-    const [isInView, setIsInView] = useState(false);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
     const [isDesktop, setIsDesktop] = useState(true);
 
     useEffect(() => {
+      // Defer loading the video by 2 seconds so it doesn't block the initial website load,
+      // but loads in the background BEFORE the user scrolls down.
+      const timer = setTimeout(() => {
+        setIsLoaded(true);
+      }, 2000);
+
       const checkIsDesktop = () => setIsDesktop(window.innerWidth >= 768);
       checkIsDesktop();
       window.addEventListener('resize', checkIsDesktop);
@@ -16,17 +23,19 @@ export default function ExtraSections() {
       const observer = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
-            setIsInView(true);
+            setIsVisible(true);
+            setIsLoaded(true); // Just in case they scroll down instantly
             if (videoRef.current && window.innerWidth < 768) {
               videoRef.current.play().catch(() => {});
             }
           } else {
+            setIsVisible(false);
             if (videoRef.current) {
               videoRef.current.pause();
             }
           }
         },
-        { rootMargin: "100px" }
+        { rootMargin: "200px" }
       );
 
       if (containerRef.current) {
@@ -34,13 +43,14 @@ export default function ExtraSections() {
       }
 
       return () => {
+        clearTimeout(timer);
         window.removeEventListener('resize', checkIsDesktop);
         observer.disconnect();
       };
     }, []);
 
     const handleMouseEnter = () => {
-      if (isDesktop && videoRef.current && isInView) {
+      if (isDesktop && videoRef.current && isLoaded) {
         videoRef.current.play().catch(() => {});
       }
     };
@@ -58,7 +68,7 @@ export default function ExtraSections() {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        {isInView ? (
+        {isLoaded ? (
           <>
             <video 
               ref={videoRef}
@@ -67,7 +77,7 @@ export default function ExtraSections() {
               loop 
               muted 
               playsInline 
-              preload="metadata"
+              preload="auto"
             />
             {isDesktop && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-500 opacity-100 group-hover:opacity-0 bg-black/10">
@@ -78,7 +88,7 @@ export default function ExtraSections() {
             )}
           </>
         ) : (
-          <div className="w-full h-full bg-[#1c2620]/20" />
+          <div className="w-full h-full bg-[#1c2620]" />
         )}
       </div>
     );
