@@ -107,6 +107,11 @@ export default function Carousel() {
     duration: 30,
     slidesToScroll: 1,
     watchDrag: true,
+    breakpoints: {
+      '(max-width: 768px)': { 
+        dragFree: true 
+      }
+    }
   });
 
   const wheelDeltaRef = useRef(0);
@@ -220,7 +225,6 @@ export default function Carousel() {
         <div
           ref={setRefs}
           className="relative overflow-hidden select-none py-12 -my-6 carousel-viewport cursor-grab"
-          style={{ touchAction: "pan-y pinch-zoom" }}
         >
           <div className="carousel-container -ml-3 md:-ml-5 flex items-stretch">
             {products.map((product, index) => {
