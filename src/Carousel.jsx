@@ -59,23 +59,23 @@ const ProductCard = ({ product }) => {
       className="relative flex flex-col h-full w-full rounded-[24px] bg-[#f2f0ea] dark:bg-[#111916] border border-outline-variant/30 dark:border-white/10 shadow-sm carousel-card transition-colors duration-300"
     >
       <div className="flex flex-col h-full rounded-[24px] overflow-hidden pointer-events-none">
-        
+
         {/* Top Image Box */}
         <div className="relative w-full aspect-[4/5] flex items-center justify-center overflow-hidden select-none">
           {product.image ?
-            <img 
-              src={product.image} 
-              alt={product.title} 
+            <img
+              src={product.image}
+              alt={product.title}
               draggable="false"
-              className="object-cover object-center w-full h-full pointer-events-none mix-blend-multiply dark:mix-blend-normal"
+              className="object-cover object-center w-full h-full pointer-events-none mix-blend-darken dark:mix-blend-normal"
             />
-          : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-[#454e47] dark:text-[#8a9589] font-body text-sm tracking-widest uppercase">
-                Image Pending
-              </span>
-            </div>
-          )}
+            : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-[#454e47] dark:text-[#8a9589] font-body text-sm tracking-widest uppercase">
+                  Image Pending
+                </span>
+              </div>
+            )}
         </div>
 
         {/* Bottom Text Box */}
@@ -138,7 +138,7 @@ export default function Carousel() {
         viewportRef.current.classList.remove('cursor-grab');
       }
     };
-    
+
     const onPointerUp = () => {
       if (viewportRef.current) {
         viewportRef.current.classList.remove('cursor-grabbing', 'carousel-dragging');
@@ -204,14 +204,14 @@ export default function Carousel() {
 
   return (
     <section className="relative w-full overflow-hidden bg-surface dark:bg-[#0a0f0c] select-none pt-8 md:pt-24 pb-4 transition-colors duration-300">
-      
+
       <div className="max-w-[1600px] mx-auto px-6 md:px-12 mb-10 flex flex-col md:flex-row items-start md:items-end justify-between gap-6 reveal-up">
         <div className="max-w-2xl reveal-up">
-            <span className="block text-[10px] md:text-xs font-bold tracking-[0.3em] uppercase font-body text-on-surface-variant dark:text-[#8a9589] mb-4">Our Catalog</span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-headline text-[#1a2a22] dark:text-white leading-tight">Our Product Lines</h2>
-            <p className="mt-6 text-base md:text-lg font-body text-[#454e47] dark:text-[#8a9589] leading-relaxed">
-                Purpose-built collections engineered for distinct operational requirements. From executive gifting to field deployments.
-            </p>
+          <span className="block text-[10px] md:text-xs font-bold tracking-[0.3em] uppercase font-body text-on-surface-variant dark:text-[#8a9589] mb-4">Our Catalog</span>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-headline text-[#1a2a22] dark:text-white leading-tight">Our Product Lines</h2>
+          <p className="mt-6 text-base md:text-lg font-body text-[#454e47] dark:text-[#8a9589] leading-relaxed">
+            Purpose-built collections engineered for distinct operational requirements. From executive gifting to field deployments.
+          </p>
         </div>
       </div>
 
