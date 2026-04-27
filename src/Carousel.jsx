@@ -56,21 +56,21 @@ const products = [
 const ProductCard = ({ product }) => {
   return (
     <div
-      className="relative flex flex-col h-full w-full rounded-[24px] bg-surface-container-lowest dark:bg-[#111916] border border-outline-variant/30 dark:border-white/10 shadow-sm carousel-card"
+      className="relative flex flex-col h-full w-full rounded-[24px] bg-[#f2f0ea] dark:bg-[#111916] border border-outline-variant/30 dark:border-white/10 shadow-sm carousel-card transition-colors duration-300"
     >
       <div className="flex flex-col h-full rounded-[24px] overflow-hidden pointer-events-none">
         
         {/* Top Image Box */}
-        <div className="relative w-full aspect-[4/5] bg-[#f2f0ea] dark:bg-[#131b16] flex items-center justify-center border-b border-outline-variant/10 dark:border-white/5 overflow-hidden select-none">
+        <div className="relative w-full aspect-[4/5] flex items-center justify-center overflow-hidden select-none">
           {product.image ?
             <img 
               src={product.image} 
               alt={product.title} 
               draggable="false"
-              className="object-cover object-center w-full h-full pointer-events-none"
+              className="object-cover object-center w-full h-full pointer-events-none mix-blend-multiply dark:mix-blend-normal"
             />
           : (
-            <div className="absolute inset-0 bg-[#c5d5bf] dark:bg-[#1c2620] flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center">
               <span className="text-[#454e47] dark:text-[#8a9589] font-body text-sm tracking-widest uppercase">
                 Image Pending
               </span>
@@ -79,7 +79,7 @@ const ProductCard = ({ product }) => {
         </div>
 
         {/* Bottom Text Box */}
-        <div className="p-6 md:p-8 flex flex-col flex-grow bg-white dark:bg-[#111916]">
+        <div className="p-6 md:p-8 flex flex-col flex-grow">
           <div className="flex flex-wrap gap-2 mb-4">
             {product.subtitle.split('•').map((sub, i) => (
               <span key={i} className="px-3 py-1 text-[9px] font-bold tracking-[0.2em] uppercase border border-outline-variant/40 dark:border-[#8a9589]/30 rounded-full text-[#454e47] dark:text-[#8a9589]">
