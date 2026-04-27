@@ -108,9 +108,10 @@ export default function Carousel() {
       dragFree: false,
       containScroll: false,
       skipSnaps: false,
-      duration: 22,
+      duration: 28,
       slidesToScroll: 1,
       watchDrag: true,
+      dragThreshold: 6,
       // Mobile browsers trigger frequent viewport resizes (URL bar show/hide), which can
       // cause subtle snap jitter if Embla re-inits during/after swipes.
       watchResize: false,
@@ -246,7 +247,7 @@ export default function Carousel() {
         <div
           ref={setRefs}
           className="relative overflow-hidden select-none py-12 -my-6 carousel-viewport cursor-grab"
-          style={{ touchAction: "pan-y" }}
+          style={{ touchAction: "pan-y", overscrollBehaviorX: "contain" }}
         >
           <div className="carousel-container -ml-3 md:-ml-5 flex items-stretch will-change-transform [transform:translate3d(0,0,0)]">
             {products.map((product) => {
