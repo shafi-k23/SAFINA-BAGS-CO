@@ -248,13 +248,13 @@ export default function Carousel() {
           className="relative overflow-hidden select-none py-12 -my-6 carousel-viewport cursor-grab"
           style={{ touchAction: "pan-y" }}
         >
-          <div className="carousel-container -mx-1.5 md:-ml-5 md:mr-0 flex items-stretch will-change-transform [transform:translate3d(0,0,0)]">
+          <div className="carousel-container -ml-3 md:-ml-5 flex items-stretch will-change-transform [transform:translate3d(0,0,0)]">
             {products.map((product) => {
               return (
                 <div
                   key={product.id}
                   className={cn(
-                    "carousel-slide px-1.5 md:pl-5 md:pr-0 min-w-0 [backface-visibility:hidden]",
+                    "carousel-slide pl-3 md:pl-5 min-w-0 [backface-visibility:hidden]",
                     // Mobile card structure from d850c1c.
                     "flex-[0_0_85%]",
                     // Tablet
