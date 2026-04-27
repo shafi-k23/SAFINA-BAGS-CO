@@ -248,15 +248,15 @@ export default function Carousel() {
           className="relative overflow-hidden select-none py-12 -my-6 carousel-viewport cursor-grab"
           style={{ touchAction: "pan-y" }}
         >
-          <div className="carousel-container md:-ml-5 flex items-stretch will-change-transform [transform:translate3d(0,0,0)]">
+          <div className="carousel-container -ml-3 md:-ml-5 flex items-stretch will-change-transform [transform:translate3d(0,0,0)]">
             {products.map((product) => {
               return (
                 <div
                   key={product.id}
                   className={cn(
-                    "carousel-slide md:pl-5 min-w-0 [backface-visibility:hidden]",
-                    // Mobile: one full card centered with no side-card border peeking.
-                    "flex-[0_0_100%]",
+                    "carousel-slide pl-3 md:pl-5 min-w-0 [backface-visibility:hidden]",
+                    // Mobile card structure from d850c1c.
+                    "flex-[0_0_85%]",
                     // Tablet
                     "sm:flex-[0_0_50%]",
                     // Desktop: ~30% so 3 cards fit nicely in view
