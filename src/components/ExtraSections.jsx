@@ -6,16 +6,9 @@ export default function ExtraSections() {
     const videoRef = useRef(null);
     const containerRef = useRef(null);
     const [isLoaded, setIsLoaded] = useState(false);
-    const [isVisible, setIsVisible] = useState(false);
     const [isDesktop, setIsDesktop] = useState(true);
 
     useEffect(() => {
-      // Defer loading the video by 2 seconds so it doesn't block the initial website load,
-      // but loads in the background BEFORE the user scrolls down.
-      const timer = setTimeout(() => {
-        setIsLoaded(true);
-      }, 2000);
-
       const checkIsDesktop = () => setIsDesktop(window.innerWidth >= 768);
       checkIsDesktop();
       window.addEventListener('resize', checkIsDesktop);
@@ -23,19 +16,17 @@ export default function ExtraSections() {
       const observer = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
-            setIsVisible(true);
-            setIsLoaded(true); // Just in case they scroll down instantly
+            setIsLoaded(true);
             if (videoRef.current && window.innerWidth < 768) {
               videoRef.current.play().catch(() => {});
             }
           } else {
-            setIsVisible(false);
             if (videoRef.current) {
               videoRef.current.pause();
             }
           }
         },
-        { rootMargin: "200px" }
+        { rootMargin: "300px" }
       );
 
       if (containerRef.current) {
@@ -43,14 +34,17 @@ export default function ExtraSections() {
       }
 
       return () => {
-        clearTimeout(timer);
         window.removeEventListener('resize', checkIsDesktop);
         observer.disconnect();
       };
     }, []);
 
     const handleMouseEnter = () => {
-      if (isDesktop && videoRef.current && isLoaded) {
+      if (!isDesktop) return;
+      if (!isLoaded) {
+        setIsLoaded(true);
+      }
+      if (videoRef.current) {
         videoRef.current.play().catch(() => {});
       }
     };
@@ -77,7 +71,7 @@ export default function ExtraSections() {
               loop 
               muted 
               playsInline 
-              preload="auto"
+              preload="metadata"
             />
             {isDesktop && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-500 opacity-100 group-hover:opacity-0 bg-black/10">
@@ -166,6 +160,8 @@ export default function ExtraSections() {
                         alt={item.label} 
                         className="absolute inset-0 w-full h-full object-cover" 
                         loading="lazy"
+                        decoding="async"
+                        fetchpriority="low"
                       />
                     )
                   ) : (

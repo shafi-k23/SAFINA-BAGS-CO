@@ -69,6 +69,7 @@ const ProductCard = ({ product }) => {
               draggable="false"
               loading="lazy"
               decoding="async"
+              fetchpriority="low"
               className="object-cover object-center w-full h-full pointer-events-none mix-blend-darken dark:mix-blend-normal"
             />
             : (

@@ -27,7 +27,7 @@ export default function Hero() {
   return (
     <motion.section
       variants={containerVariants}
-      initial="hidden"
+      initial="show"
       animate="show"
       id="hero-section"
       className="grid grid-cols-1 gap-5 md:grid-cols-12 md:gap-0 items-start px-6 md:px-12 relative mb-10 md:mb-20 text-left pt-20 md:pt-32"
@@ -101,6 +101,7 @@ export default function Hero() {
               className="object-cover w-full h-full hover:scale-105 transition-transform duration-1000"
               width="800"
               height="1000"
+              decoding="async"
               fetchpriority="high"
             />
           </div>
