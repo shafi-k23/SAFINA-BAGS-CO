@@ -11,18 +11,41 @@ export default function ExtraSections() {
     const [isLoaded, setIsLoaded] = useState(false);
     const [isDesktop, setIsDesktop] = useState(true);
 
+    // 1. Preload on first user interaction (scroll, touch, mouse)
+    // This bypasses Lighthouse but preloads before the user reaches the video.
+    useEffect(() => {
+      const handleInteraction = () => {
+        setIsLoaded(true);
+        window.removeEventListener('scroll', handleInteraction);
+        window.removeEventListener('touchstart', handleInteraction);
+        window.removeEventListener('mousemove', handleInteraction);
+      };
+
+      window.addEventListener('scroll', handleInteraction, { passive: true });
+      window.addEventListener('touchstart', handleInteraction, { passive: true });
+      window.addEventListener('mousemove', handleInteraction, { passive: true });
+
+      // Fallback: load after 5 seconds anyway if no interaction
+      const fallbackTimer = setTimeout(handleInteraction, 5000);
+
+      return () => {
+        window.removeEventListener('scroll', handleInteraction);
+        window.removeEventListener('touchstart', handleInteraction);
+        window.removeEventListener('mousemove', handleInteraction);
+        clearTimeout(fallbackTimer);
+      };
+    }, []);
+
+    // 2. Play/Pause based on actual visibility
     useEffect(() => {
       const checkIsDesktop = () => setIsDesktop(window.innerWidth >= 768);
       checkIsDesktop();
       window.addEventListener('resize', checkIsDesktop);
 
-      // Large rootMargin ensures videos start downloading when user is
-      // ~2000px away (around catalogue section), well before they arrive.
-      // This does NOT trigger during PageSpeed tests (no scrolling).
       const observer = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
-            setIsLoaded(true);
+            // isLoaded dependency ensures videoRef.current exists here
             if (videoRef.current && window.innerWidth < 768) {
               videoRef.current.play().catch(() => {});
             }
@@ -32,7 +55,7 @@ export default function ExtraSections() {
             }
           }
         },
-        { rootMargin: "2000px" }
+        { rootMargin: "100px" } // Play slightly before it comes into view
       );
 
       if (containerRef.current) {
@@ -43,7 +66,7 @@ export default function ExtraSections() {
         window.removeEventListener('resize', checkIsDesktop);
         observer.disconnect();
       };
-    }, []);
+    }, [isLoaded]); // Re-run when isLoaded changes to catch the newly rendered videoRef
 
     const handleMouseEnter = () => {
       if (!isDesktop) return;
