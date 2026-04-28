@@ -11,21 +11,14 @@ export default function ExtraSections() {
     const [isLoaded, setIsLoaded] = useState(false);
     const [isDesktop, setIsDesktop] = useState(true);
 
-    // Background preload: create video elements after a short delay
-    // so videos download in the background before user scrolls there
-    useEffect(() => {
-      const preloadTimer = setTimeout(() => {
-        setIsLoaded(true);
-      }, 2000);
-      return () => clearTimeout(preloadTimer);
-    }, []);
-
     useEffect(() => {
       const checkIsDesktop = () => setIsDesktop(window.innerWidth >= 768);
       checkIsDesktop();
       window.addEventListener('resize', checkIsDesktop);
 
-      // IntersectionObserver handles auto-play/pause based on visibility
+      // Large rootMargin ensures videos start downloading when user is
+      // ~2000px away (around catalogue section), well before they arrive.
+      // This does NOT trigger during PageSpeed tests (no scrolling).
       const observer = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
@@ -39,7 +32,7 @@ export default function ExtraSections() {
             }
           }
         },
-        { rootMargin: "300px" }
+        { rootMargin: "2000px" }
       );
 
       if (containerRef.current) {
