@@ -8,7 +8,7 @@ function cn(...inputs) {
 }
 
 const buildSrcSet = (base, widths) => widths.map((width) => `${base}-${width}.webp ${width}w`).join(", ");
-const carouselSizes = "(min-width: 1280px) 28vw, (min-width: 1024px) 30vw, (min-width: 640px) 50vw, 85vw";
+const carouselSizes = "(min-width: 1280px) 28vw, (min-width: 1024px) 30vw, (min-width: 640px) 50vw, 80vw";
 
 const products = [
   {
@@ -168,10 +168,13 @@ export default function Carousel() {
     if (!emblaApi) return;
 
     const onSelect = () => {
-      const idx = emblaApi.selectedScrollSnap();
-      if (srTextRef.current && products[idx]) {
-        srTextRef.current.textContent = products[idx].title;
-      }
+      // Batch layout reads in a rAF to avoid forced reflow
+      requestAnimationFrame(() => {
+        const idx = emblaApi.selectedScrollSnap();
+        if (srTextRef.current && products[idx]) {
+          srTextRef.current.textContent = products[idx].title;
+        }
+      });
     };
 
     const onPointerDown = () => {

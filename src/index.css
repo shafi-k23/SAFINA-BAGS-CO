@@ -2,5 +2,77 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Font display swap for instant text rendering ── */
+@font-face {
+  font-family: 'Playfair Display';
+  font-display: swap;
+  src: local('Playfair Display');
+}
+@font-face {
+  font-family: 'Manrope';
+  font-display: swap;
+  src: local('Manrope');
+}
+
 body { margin: 0; padding: 0; overflow-x: hidden; }
 .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+/* ── Hero image entrance (replaces framer-motion spring) ── */
+@keyframes heroImageEnter {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.hero-image-enter {
+  animation: heroImageEnter 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+
+/* ── Hero badge entrance ── */
+@keyframes heroBadgeEnter {
+  from { opacity: 0; transform: translateY(50px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hero-badge-enter {
+  animation: heroBadgeEnter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both;
+}
+
+/* ── Floating badge bob (moved from Hero inline <style>) ── */
+@keyframes floatBadgeHardware {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(0, -10px, 0); }
+}
+.animate-float-hardware {
+  animation: floatBadgeHardware 4s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* ── Navbar slide-down (replaces framer-motion spring) ── */
+@keyframes navbarSlideDown {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(0); }
+}
+.navbar-enter {
+  animation: navbarSlideDown 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Mobile menu fade-in ── */
+@keyframes mobileMenuFadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.mobile-menu-enter {
+  animation: mobileMenuFadeIn 0.3s ease-out both;
+}
+
+/* ── Marquee infinite scroll ── */
+@keyframes infinite-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
+}
+.animate-infinite-scroll {
+  animation: infinite-scroll 25s linear infinite;
+}
+
+/* ── Carousel reflow containment ── */
+.carousel-viewport {
+  contain: layout style;
+}

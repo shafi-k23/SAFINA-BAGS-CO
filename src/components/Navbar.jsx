@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 
 export default function Navbar() {
   const [isDark, setIsDark] = useState(false);
@@ -37,11 +36,8 @@ export default function Navbar() {
 
   return (
     <>
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ type: 'spring', stiffness: 100, damping: 20 }}
-        className="fixed top-0 z-50 flex items-center justify-between w-full px-4 sm:px-6 md:px-12 py-3 md:py-4 backdrop-blur-md bg-[#faf8f4]/90 dark:bg-[#0a0f0c]/90 transition-colors duration-500"
+      <nav
+        className="navbar-enter fixed top-0 z-50 flex items-center justify-between w-full px-4 sm:px-6 md:px-12 py-3 md:py-4 backdrop-blur-md bg-[#faf8f4]/90 dark:bg-[#0a0f0c]/90 transition-colors duration-500"
       >
         <div className="flex items-center gap-2 sm:gap-3">
           <button
@@ -122,15 +118,12 @@ export default function Navbar() {
             Quote
           </button>
         </div>
-      </motion.nav>
+      </nav>
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          className="fixed inset-0 z-40 bg-[#faf8f4] pt-24 px-6 dark:bg-[#0a0f0c]"
+        <div
+          className="fixed inset-0 z-40 bg-[#faf8f4] pt-24 px-6 dark:bg-[#0a0f0c] mobile-menu-enter"
         >
           <div className="flex flex-col space-y-6">
             {['Products', 'Manufacturing', 'FAQ', 'Contact'].map((item) => (
@@ -143,7 +136,7 @@ export default function Navbar() {
               </button>
             ))}
           </div>
-        </motion.div>
+        </div>
       )}
     </>
   );

@@ -85,7 +85,7 @@ export default function Manufacturing() {
                   {step.num}
                 </div>
                 <div>
-                  <h4 className="mb-1 text-sm font-bold tracking-widest uppercase font-body">{step.title}</h4>
+                  <h3 className="mb-1 text-sm font-bold tracking-widest uppercase font-body">{step.title}</h3>
                   <p className="text-sm font-body text-[#454e47] dark:text-[#8a9589] leading-relaxed">{step.desc}</p>
                 </div>
               </motion.div>
