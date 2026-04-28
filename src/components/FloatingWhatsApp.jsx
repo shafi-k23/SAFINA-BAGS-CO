@@ -62,7 +62,15 @@ export default function FloatingWhatsApp() {
                   <div className="flex items-center gap-3">
                     <div className="relative">
                       <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center p-1">
-                        <img src="/images/logo.webp" alt="Safina Bags" className="w-full h-full object-contain" />
+                        <img
+                          src="/images/logo.webp"
+                          srcSet="/images/logo-64.webp 64w, /images/logo-128.webp 128w, /images/logo-256.webp 256w"
+                          sizes="40px"
+                          alt="Safina Bags"
+                          className="w-full h-full object-contain"
+                          decoding="async"
+                          loading="lazy"
+                        />
                       </div>
                       <div className="absolute bottom-0 right-0 w-3 h-3 bg-[#25D366] border-2 border-white rounded-full"></div>
                     </div>

@@ -97,6 +97,8 @@ export default function Hero() {
           <div className="w-full h-full overflow-hidden bg-surface-container dark:bg-[#131b16] rounded-2xl shadow-xl md:shadow-none shadow-[#1a2a22]/10 will-change-transform">
             <img
               src="images/image-1.webp"
+              srcSet="images/image-1-640.webp 640w, images/image-1-960.webp 960w, images/image-1-1280.webp 1280w"
+              sizes="(min-width: 1024px) 40vw, 100vw"
               alt="Premium Backpack Manufacturing at Safina Bags"
               className="object-cover w-full h-full hover:scale-105 transition-transform duration-1000"
               width="800"

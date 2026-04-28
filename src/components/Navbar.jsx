@@ -58,10 +58,13 @@ export default function Navbar() {
           >
             <img
               src="/images/logo.webp"
+              srcSet="/images/logo-64.webp 64w, /images/logo-128.webp 128w, /images/logo-256.webp 256w"
+              sizes="(min-width: 768px) 120px, 96px"
               alt="Safina Bags Co. Logo"
               className="h-6 sm:h-8 md:h-10 w-auto dark:invert transition-all"
               width="120"
               height="40"
+              decoding="async"
             />
             <span className="text-[17px] sm:text-lg md:text-xl tracking-tighter font-serif font-headline text-[#1a2a22] dark:text-[#faf8f4] whitespace-nowrap">
               Safina Bags Co.

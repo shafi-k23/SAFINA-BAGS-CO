@@ -7,6 +7,9 @@ function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
+const buildSrcSet = (base, widths) => widths.map((width) => `${base}-${width}.webp ${width}w`).join(", ");
+const carouselSizes = "(min-width: 1280px) 28vw, (min-width: 1024px) 30vw, (min-width: 640px) 50vw, 85vw";
+
 const products = [
   {
     id: 1,
@@ -14,6 +17,8 @@ const products = [
     subtitle: "TECH-READY • MINIMALIST",
     desc: "For tech companies, startups, and onboarding kits. Structured compartments and secure organization.",
     image: "images/image-3.webp",
+    srcSet: buildSrcSet("images/image-3", [480, 768, 1024]),
+    sizes: carouselSizes,
   },
   {
     id: 2,
@@ -21,6 +26,8 @@ const products = [
     subtitle: "RUGGED",
     desc: "For logistics teams, field workers, and travel brands. High-capacity builds with weather-resistant materials.",
     image: "images/image-4.webp",
+    srcSet: buildSrcSet("images/image-4", [480, 768, 1024]),
+    sizes: carouselSizes,
   },
   {
     id: 3,
@@ -28,6 +35,8 @@ const products = [
     subtitle: "PREMIUM • GIFTING",
     desc: "Premium branded bags for corporate gifting and VIP clients with subtle, elegant customization.",
     image: "images/image-5.webp",
+    srcSet: buildSrcSet("images/image-5", [480, 768, 1024]),
+    sizes: carouselSizes,
   },
   {
     id: 4,
@@ -35,6 +44,8 @@ const products = [
     subtitle: "EVERYDAY • LIGHTWEIGHT",
     desc: "Perfect for daily commuters and casual use. Lightweight, durable, and stylish designs.",
     image: "images/image-6.webp",
+    srcSet: buildSrcSet("images/image-6", [480, 768, 1024]),
+    sizes: carouselSizes,
   },
   {
     id: 5,
@@ -42,6 +53,8 @@ const products = [
     subtitle: "INSTITUTIONAL • ERGONOMIC",
     desc: "Institutional bulk orders for education. Built for daily wear and tear with ergonomic support.",
     image: "images/image-7.webp",
+    srcSet: buildSrcSet("images/image-7", [480, 768, 1024]),
+    sizes: carouselSizes,
   },
   {
     id: 6,
@@ -49,6 +62,8 @@ const products = [
     subtitle: "TECH • SECURE",
     desc: "Dedicated padded compartments for electronics. Ideal for students, tech workers, and professionals.",
     image: "images/image-8.webp",
+    srcSet: buildSrcSet("images/image-8", [480, 768, 1024]),
+    sizes: carouselSizes,
   }
 ];
 
@@ -65,6 +80,8 @@ const ProductCard = ({ product }) => {
           {product.image ?
             <img
               src={product.image}
+              srcSet={product.srcSet}
+              sizes={product.sizes}
               alt={product.title}
               draggable="false"
               loading="lazy"

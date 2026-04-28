@@ -55,9 +55,13 @@ export default function Manufacturing() {
         >
           <img 
             src="images/image-2.webp" 
+            srcSet="images/image-2-640.webp 640w, images/image-2-960.webp 960w, images/image-2-1280.webp 1280w"
+            sizes="(min-width: 1024px) 45vw, (min-width: 768px) 50vw, 100vw"
             alt="Backpack Manufacturing Process and Quality Control" 
             className="object-cover w-full h-full hover:scale-105 transition-transform duration-[10s]" 
             loading="lazy" 
+            decoding="async"
+            fetchpriority="low"
           />
         </motion.div>
 

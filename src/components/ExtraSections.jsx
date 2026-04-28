@@ -2,6 +2,9 @@ import React, { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
 export default function ExtraSections() {
+  const buildSrcSet = (base, widths) => widths.map((width) => `${base}-${width}.webp ${width}w`).join(", ");
+  const factorySizes = "(min-width: 1024px) 30vw, (min-width: 768px) 33vw, 100vw";
+
   const HoverVideo = ({ src, className }) => {
     const videoRef = useRef(null);
     const containerRef = useRef(null);
@@ -94,11 +97,11 @@ export default function ExtraSections() {
       { type: 'video', src: 'images/stitching-video1-horizontal.mp4', icon: 'videocam', label: 'Stitching Video 1', orientation: 'horizontal' }
     ],
     [
-      { type: 'image', src: 'images/factory-layout-horizontal.webp', icon: 'factory', label: 'Factory Layout Photo', orientation: 'horizontal' },
-      { type: 'image', src: 'images/factory-layout-vertical.webp', icon: 'factory', label: 'Factory Machinery Photo', orientation: 'vertical' }
+      { type: 'image', src: 'images/factory-layout-horizontal.webp', srcSet: buildSrcSet('images/factory-layout-horizontal', [480, 768, 1024]), sizes: factorySizes, icon: 'factory', label: 'Factory Layout Photo', orientation: 'horizontal' },
+      { type: 'image', src: 'images/factory-layout-vertical.webp', srcSet: buildSrcSet('images/factory-layout-vertical', [480, 768, 1024]), sizes: factorySizes, icon: 'factory', label: 'Factory Machinery Photo', orientation: 'vertical' }
     ],
     [
-      { type: 'image', src: 'images/quality%20check%20vertical.webp', icon: 'verified', label: 'Quality Checking Photo', orientation: 'vertical' },
+      { type: 'image', src: 'images/quality%20check%20vertical.webp', srcSet: buildSrcSet('images/quality%20check%20vertical', [480, 768, 1024]), sizes: factorySizes, icon: 'verified', label: 'Quality Checking Photo', orientation: 'vertical' },
       { type: 'video', src: 'images/stitching%20video2-horizontal.mp4', icon: 'videocam', label: 'Stitching Video 2', orientation: 'horizontal' }
     ]
   ];
@@ -157,6 +160,8 @@ export default function ExtraSections() {
                     ) : (
                       <img 
                         src={item.src} 
+                        srcSet={item.srcSet}
+                        sizes={item.sizes}
                         alt={item.label} 
                         className="absolute inset-0 w-full h-full object-cover" 
                         loading="lazy"
