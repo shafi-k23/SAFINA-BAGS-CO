@@ -11,26 +11,30 @@ export default function ExtraSections() {
     const [isLoaded, setIsLoaded] = useState(false);
     const [isDesktop, setIsDesktop] = useState(true);
 
-    // 1. Lazy-load video only when its container is near the viewport.
-    //    Each video instance loads independently — prevents simultaneous
-    //    decode of all videos which causes scroll jank on lower-end phones.
+    // 1. Preload on first user interaction (scroll, touch, mouse).
+    //    Fires early so all videos are ready before the user reaches the factory section.
     useEffect(() => {
-      const node = containerRef.current;
-      if (!node || isLoaded) return;
+      const handleInteraction = () => {
+        setIsLoaded(true);
+        window.removeEventListener('scroll', handleInteraction);
+        window.removeEventListener('touchstart', handleInteraction);
+        window.removeEventListener('mousemove', handleInteraction);
+      };
 
-      const loadObserver = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            setIsLoaded(true);
-            loadObserver.disconnect();
-          }
-        },
-        { rootMargin: "200px" }
-      );
+      window.addEventListener('scroll', handleInteraction, { passive: true });
+      window.addEventListener('touchstart', handleInteraction, { passive: true });
+      window.addEventListener('mousemove', handleInteraction, { passive: true });
 
-      loadObserver.observe(node);
-      return () => loadObserver.disconnect();
-    }, [isLoaded]);
+      // Fallback: load after 5 seconds anyway if no interaction
+      const fallbackTimer = setTimeout(handleInteraction, 5000);
+
+      return () => {
+        window.removeEventListener('scroll', handleInteraction);
+        window.removeEventListener('touchstart', handleInteraction);
+        window.removeEventListener('mousemove', handleInteraction);
+        clearTimeout(fallbackTimer);
+      };
+    }, []);
 
     // 2. Play/Pause based on actual visibility
     useEffect(() => {
@@ -57,7 +61,7 @@ export default function ExtraSections() {
             }
           }
         },
-        { rootMargin: "0px" }
+        { rootMargin: "100px" }
       );
 
       if (containerRef.current) {
@@ -103,7 +107,7 @@ export default function ExtraSections() {
               loop 
               muted 
               playsInline 
-              preload="none"
+              preload="metadata"
             />
             {isDesktop && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-500 opacity-100 group-hover:opacity-0 bg-black/10">
