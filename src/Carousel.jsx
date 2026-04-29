@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -126,7 +126,7 @@ export default function Carousel() {
       dragFree: false,
       containScroll: false,
       skipSnaps: false,
-      duration: 22,
+      duration: 28,
       slidesToScroll: 1,
       watchDrag: true,
       // Mobile browsers trigger frequent viewport resizes (URL bar show/hide), which can
@@ -150,6 +150,9 @@ export default function Carousel() {
   );
 
   const [emblaRef, emblaApi] = useEmblaCarousel(emblaOptions);
+
+  const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
 
   const wheelDeltaRef = useRef(0);
   const wheelTimeoutRef = useRef(null);
@@ -264,20 +267,37 @@ export default function Carousel() {
 
       {/* Carousel Container */}
       <div className="w-full relative pb-4 md:pb-6 overflow-hidden mx-auto max-w-[1600px]">
+
+        {/* Prev / Next Arrow Buttons — desktop only */}
+        <button
+          onClick={scrollPrev}
+          aria-label="Previous slide"
+          className="hidden md:flex items-center justify-center absolute left-3 lg:left-6 top-[40%] -translate-y-1/2 z-10 w-11 h-11 rounded-full border border-outline-variant/40 dark:border-white/10 bg-surface/80 dark:bg-[#111916]/80 backdrop-blur-sm text-on-surface-variant dark:text-[#8a9589] hover:bg-primary-container/60 dark:hover:bg-white/10 hover:text-on-surface dark:hover:text-white hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer shadow-sm"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+        </button>
+        <button
+          onClick={scrollNext}
+          aria-label="Next slide"
+          className="hidden md:flex items-center justify-center absolute right-3 lg:right-6 top-[40%] -translate-y-1/2 z-10 w-11 h-11 rounded-full border border-outline-variant/40 dark:border-white/10 bg-surface/80 dark:bg-[#111916]/80 backdrop-blur-sm text-on-surface-variant dark:text-[#8a9589] hover:bg-primary-container/60 dark:hover:bg-white/10 hover:text-on-surface dark:hover:text-white hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer shadow-sm"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 6 15 12 9 18" /></svg>
+        </button>
+
         <div
           ref={setRefs}
-          className="relative overflow-hidden select-none py-12 -my-6 carousel-viewport cursor-grab"
+          className="relative overflow-hidden select-none carousel-viewport cursor-grab"
           style={{ touchAction: "pan-y" }}
         >
-          <div className="carousel-container -ml-3 md:-ml-5 flex items-stretch will-change-transform [transform:translate3d(0,0,0)]">
+          <div className="carousel-container flex items-stretch [transform:translate3d(0,0,0)]">
             {products.map((product) => {
               return (
                 <div
                   key={product.id}
                   className={cn(
-                    "carousel-slide pl-3 md:pl-5 min-w-0 [backface-visibility:hidden]",
-                    // Mobile card structure from d850c1c.
-                    "flex-[0_0_85%]",
+                    "carousel-slide min-w-0 px-[6px] md:px-[10px]",
+                    // Mobile: 82% leaves ~9% peek on each side
+                    "flex-[0_0_82%]",
                     // Tablet
                     "sm:flex-[0_0_50%]",
                     // Desktop: ~30% so 3 cards fit nicely in view

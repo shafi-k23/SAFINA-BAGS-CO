@@ -11,30 +11,26 @@ export default function ExtraSections() {
     const [isLoaded, setIsLoaded] = useState(false);
     const [isDesktop, setIsDesktop] = useState(true);
 
-    // 1. Preload on first user interaction (scroll, touch, mouse)
-    // This bypasses Lighthouse but preloads before the user reaches the video.
+    // 1. Lazy-load video only when its container is near the viewport.
+    //    Each video instance loads independently — prevents simultaneous
+    //    decode of all videos which causes scroll jank on lower-end phones.
     useEffect(() => {
-      const handleInteraction = () => {
-        setIsLoaded(true);
-        window.removeEventListener('scroll', handleInteraction);
-        window.removeEventListener('touchstart', handleInteraction);
-        window.removeEventListener('mousemove', handleInteraction);
-      };
+      const node = containerRef.current;
+      if (!node || isLoaded) return;
 
-      window.addEventListener('scroll', handleInteraction, { passive: true });
-      window.addEventListener('touchstart', handleInteraction, { passive: true });
-      window.addEventListener('mousemove', handleInteraction, { passive: true });
+      const loadObserver = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setIsLoaded(true);
+            loadObserver.disconnect();
+          }
+        },
+        { rootMargin: "200px" }
+      );
 
-      // Fallback: load after 5 seconds anyway if no interaction
-      const fallbackTimer = setTimeout(handleInteraction, 5000);
-
-      return () => {
-        window.removeEventListener('scroll', handleInteraction);
-        window.removeEventListener('touchstart', handleInteraction);
-        window.removeEventListener('mousemove', handleInteraction);
-        clearTimeout(fallbackTimer);
-      };
-    }, []);
+      loadObserver.observe(node);
+      return () => loadObserver.disconnect();
+    }, [isLoaded]);
 
     // 2. Play/Pause based on actual visibility
     useEffect(() => {
@@ -47,7 +43,13 @@ export default function ExtraSections() {
           if (entry.isIntersecting) {
             // isLoaded dependency ensures videoRef.current exists here
             if (videoRef.current && window.innerWidth < 768) {
-              videoRef.current.play().catch(() => {});
+              // Defer play() to idle callback so it doesn't fight the scroll compositor
+              const schedulePlay = typeof requestIdleCallback !== 'undefined'
+                ? requestIdleCallback
+                : (cb) => setTimeout(cb, 100);
+              schedulePlay(() => {
+                if (videoRef.current) videoRef.current.play().catch(() => {});
+              });
             }
           } else {
             if (videoRef.current) {
@@ -55,7 +57,7 @@ export default function ExtraSections() {
             }
           }
         },
-        { rootMargin: "100px" } // Play slightly before it comes into view
+        { rootMargin: "0px" }
       );
 
       if (containerRef.current) {
@@ -88,6 +90,7 @@ export default function ExtraSections() {
       <div 
         ref={containerRef} 
         className="absolute inset-0 w-full h-full"
+        style={{ contain: "content" }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
@@ -100,7 +103,7 @@ export default function ExtraSections() {
               loop 
               muted 
               playsInline 
-              preload="metadata"
+              preload="none"
             />
             {isDesktop && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-500 opacity-100 group-hover:opacity-0 bg-black/10">
