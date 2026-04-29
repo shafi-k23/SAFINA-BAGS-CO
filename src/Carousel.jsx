@@ -71,7 +71,7 @@ const products = [
 const ProductCard = ({ product }) => {
   return (
     <div
-      className="relative flex flex-col h-full w-full rounded-[24px] bg-[#f2f0ea] dark:bg-[#111916] border border-outline-variant/30 dark:border-white/10 shadow-sm carousel-card transition-colors duration-300"
+      className="relative flex flex-col h-full w-full rounded-[24px] bg-[#f2f0ea] dark:bg-[#111916] border border-outline-variant/30 dark:border-white/10 shadow-sm carousel-card"
     >
       <div className="flex flex-col h-full rounded-[24px] overflow-hidden pointer-events-none">
 
@@ -87,7 +87,7 @@ const ProductCard = ({ product }) => {
               loading="lazy"
               decoding="async"
               fetchpriority="low"
-              className="object-cover object-center w-full h-full pointer-events-none mix-blend-darken dark:mix-blend-normal"
+              className="object-cover object-center w-full h-full pointer-events-none sm:mix-blend-darken dark:mix-blend-normal"
             />
             : (
               <div className="absolute inset-0 flex items-center justify-center">
@@ -289,13 +289,13 @@ export default function Carousel() {
           className="relative overflow-hidden select-none carousel-viewport cursor-grab"
           style={{ touchAction: "pan-y" }}
         >
-          <div className="carousel-container flex items-stretch [transform:translate3d(0,0,0)]">
+          <div className="carousel-container flex items-stretch will-change-transform [transform:translate3d(0,0,0)]">
             {products.map((product) => {
               return (
                 <div
                   key={product.id}
                   className={cn(
-                    "carousel-slide min-w-0 px-[6px] md:px-[10px]",
+                    "carousel-slide min-w-0 px-[6px] md:px-[10px] [backface-visibility:hidden] [transform:translate3d(0,0,0)]",
                     // Mobile: 82% leaves ~9% peek on each side
                     "flex-[0_0_82%]",
                     // Tablet

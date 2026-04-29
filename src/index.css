@@ -72,7 +72,14 @@ body { margin: 0; padding: 0; overflow-x: hidden; }
   animation: infinite-scroll 25s linear infinite;
 }
 
-/* ── Carousel reflow containment ── */
+/* ── Carousel GPU-compositing & containment ── */
 .carousel-viewport {
-  contain: layout style;
+  contain: layout style paint;
+}
+.carousel-slide {
+  will-change: transform;
+}
+/* Disable pointer-events on images during drag to prevent hit-test recalc */
+.carousel-dragging .carousel-card img {
+  pointer-events: none !important;
 }
