@@ -76,9 +76,6 @@ body { margin: 0; padding: 0; overflow-x: hidden; }
 .carousel-viewport {
   contain: layout style paint;
 }
-.carousel-slide {
-  will-change: transform;
-}
 /* Disable pointer-events on images during drag to prevent hit-test recalc */
 .carousel-dragging .carousel-card img {
   pointer-events: none !important;

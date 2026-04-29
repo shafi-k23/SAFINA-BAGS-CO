@@ -87,7 +87,7 @@ const ProductCard = ({ product }) => {
               loading="lazy"
               decoding="async"
               fetchpriority="low"
-              className="object-cover object-center w-full h-full pointer-events-none sm:mix-blend-darken dark:mix-blend-normal"
+              className="object-cover object-center w-full h-full pointer-events-none mix-blend-darken dark:mix-blend-normal"
             />
             : (
               <div className="absolute inset-0 flex items-center justify-center">
@@ -295,7 +295,7 @@ export default function Carousel() {
                 <div
                   key={product.id}
                   className={cn(
-                    "carousel-slide min-w-0 px-[6px] md:px-[10px] [backface-visibility:hidden] [transform:translate3d(0,0,0)]",
+                    "carousel-slide min-w-0 px-[6px] md:px-[10px] [backface-visibility:hidden]",
                     // Mobile: 82% leaves ~9% peek on each side
                     "flex-[0_0_82%]",
                     // Tablet
